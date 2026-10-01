@@ -71,9 +71,9 @@ The two best fits share what B1–B3 predict: ~25 m, **more straight than Vegas 
 - Use ≥ 5 trials per track, and weight **2024_reinvent_champ cw + ccw** and **2022_summit_speedway** (incl. cw) more than Vegas. Vegas-only results misled us on M06.
 - A candidate worth uploading: zero or near-zero off-tracks on those stand-ins, and lap time no worse than M05 snap2 there.
 
-### Plan: train on the stand-ins (Model 08, proposed)
+### Plan: train on the stand-ins (now part of Model 08 discrete, running since 2026-10-01 15:53)
 
-Train from the best M07 snapshot on the closest-matching tracks instead of Vegas only:
+Train on the closest-matching tracks as well as Vegas (Model 08 trains from scratch with a discrete action space, see `experiments/model08-discrete`):
 - 2024_reinvent_champ (both directions; ~1 h), then 2022_summit_speedway (both directions; ~1 h), optionally back to Vegas briefly so it doesn't forget. Our reward is track-agnostic (racing line and speed profile computed from runtime waypoints), so no reward changes are needed.
 - One simulator only, so tracks change between runs (`start_run.sh` currently forces Vegas and needs a world argument).
 - **Cost:** those tracks stop being unseen tests. New held-out set for choosing uploads: **reInvent2019_track, reinvent_base, 2022_reinvent_champ_ccw, Vegas cw** (plus one unseen ~25 m track if we find one). Judge generalization only on held-out tracks; stand-in results show fit, not generalization.

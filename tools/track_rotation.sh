@@ -2,8 +2,9 @@
 # Train one run across several tracks in turn (one simulator, so tracks take turns). Each leg is a new
 # DRfC run on its own world, pretrained from the previous leg's last checkpoint, kept alive by
 # supervise.sh, snapshotted every SNAP_MIN minutes and at its end as cedc-<label>-<tag>-HHMM.
+# PRE=none trains the first leg from scratch; LR=<lr> sets the learning rate (custom_files/hyperparameters.json).
 # Run from the project root in Git Bash:
-#   bash tools/track_rotation.sh <expdir> <label> <pretrained-prefix> <ckpt: best|last> <world:tag:minutes>...
+#   bash tools/track_rotation.sh <expdir> <label> <pretrained-prefix> <ckpt: best|last> <world:tag:minutes[:lr]>...
 # e.g. bash tools/track_rotation.sh model08-standins m08 cedc-m07-snap1332 best \
 #        2024_reinvent_champ_cw:champ:75 2022_summit_speedway:summit:75 Vegas_track:vegas:30
 set -u
@@ -16,11 +17,11 @@ curprefix() { wslrun "grep ^DR_LOCAL_S3_MODEL_PREFIX= ~/deepracer-for-cloud/run.
 # install the current helpers (start_run.sh runs before supervise.sh bootstraps)
 wslrun "sed 's/\r$//' '/mnt/c/Users/Elyas/OneDrive - The University of Colorado Denver/Desktop/projects/GrandPrixChallenge/tools/wsl/bootstrap.sh' | bash > /dev/null"
 for leg in "$@"; do
-  IFS=: read -r world tag minutes <<< "$leg"
+  IFS=: read -r world tag minutes lr <<< "$leg"
   prefix="cedc-${LABEL}-${tag}"
   stop_at=$(date -d "+${minutes} minutes" +%H:%M)
-  { echo "== $(date +%T) leg $tag: $world for $minutes min (until $stop_at), from $PRE ($CKPT)"
-    MSYS_NO_PATHCONV=1 wsl.exe -d Ubuntu-22.04 -- bash /tmp/start_run.sh "$EXP" "$prefix" "$PRE" "$CKPT" "$world" | tr -d '\0'; } >> "$LOGF" 2>&1
+  { echo "== $(date +%T) leg $tag: $world for $minutes min, lr ${lr:-${LR:-unchanged}} (until $stop_at), from $PRE ($CKPT)"
+    MSYS_NO_PATHCONV=1 wsl.exe -d Ubuntu-22.04 -- bash /tmp/start_run.sh "$EXP" "$prefix" "$PRE" "$CKPT" "$world" "${lr:-${LR:-}}" | tr -d '\0'; } >> "$LOGF" 2>&1
   sup_out="logs/${LABEL}_${tag}_supervise.txt"
   MAX_SIM_MEM_MIB=${MAX_SIM_MEM_MIB:-4000} HARD_SIM_MEM_MIB=${HARD_SIM_MEM_MIB:-8500} bash tools/supervise.sh "$stop_at" > "$sup_out" 2>&1 &
   sup=$!

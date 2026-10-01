@@ -22,6 +22,7 @@ echo $$ > "$LOCK"
 trap 'rm -f "$LOCK"' EXIT
 wslrun() { MSYS_NO_PATHCONV=1 timeout 120 wsl.exe -d Ubuntu-22.04 -- bash -c "$1" | tr -d '\0\r'; }
 end=$(date -d "$STOP_AT" +%s)
+[ "$end" -le "$(date +%s)" ] && end=$((end + 86400))   # a stop time after midnight means tomorrow
 
 # WSL shuts its VM down when no Windows process is attached (even with Docker running inside),
 # which kills training. Keep one idle connection open for as long as we supervise.

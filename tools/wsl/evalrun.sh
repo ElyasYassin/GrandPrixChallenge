@@ -25,6 +25,10 @@ end=$(( $(date +%s) + 120 + 90 * TRIALS ))
 until [ "$(docker logs $R 2>&1 | grep -c 'Finished evaluation phase')" -ge "$TRIALS" ] || [ -z "$(docker ps -q --filter id=$R)" ] || [ $(date +%s) -ge $end ]; do sleep 5; done
 sleep 5
 docker logs $R > "$OUT/robomaker.log" 2>&1
+# a crashed simulator writes no new metrics; never keep a stale/other run's file
+rm -f "$OUT/EvaluationMetrics.json" "$OUT/INCOMPLETE"
+done_trials=$(grep -c 'Finished evaluation phase' "$OUT/robomaker.log")
+[ "$done_trials" -lt "$TRIALS" ] && echo "only $done_trials/$TRIALS trials finished" > "$OUT/INCOMPLETE"
 f=$($A s3 ls --recursive s3://bucket/$PREFIX/metrics/evaluation/ | sort | tail -1 | awk '{print $4}')
 $A s3 cp s3://bucket/$f "$OUT/EvaluationMetrics.json" > /dev/null
 dr-stop-evaluation > /dev/null 2>&1; for c in $(docker ps -aq --filter name=deepracer-eval); do docker rm -f $c > /dev/null; done
