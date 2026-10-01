@@ -36,7 +36,9 @@ def main() -> None:
         for t in TRACKS:
             if d.name.endswith("-" + t):
                 prefix = d.name[: -len(t) - 1]
-                if prefix.startswith(("m04", "m05")) and prefix not in models:
+                if prefix.startswith(("m04", "m05", "m06")) and prefix not in models:
+                    models[prefix] = (prefix, 4.0 if prefix.startswith("m06") else 3.0)
+                    continue
                     models[prefix] = (prefix, 3.0)
     print(f"{'model':28} " + " ".join(f"{t[:14]:>15}" for t in TRACKS) + "   unseen avg   gap vs Vegas")
     for prefix, (label, vmax) in models.items():

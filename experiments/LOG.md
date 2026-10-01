@@ -13,6 +13,7 @@ One row per trained model. Change **one idea** per model.
 | 04 | cedc-m04-fast(-2,-3), final ckpt 108 | speed 1.3–3.0 m/s + lap bonus scaled by lap speed; both directions; from 03b final | 11:30–17:00 | ~87% mean, ~15/20 laps | all complete; **mean 17.04 s** (Vegas 15.8, Summit 19.0, re:Invent2018 13.0, 2024 CW 20.3); 15 off-tracks; unseen efficiency 55%, gap +10 | 15.64 (Vegas) | **18.008** (uploaded #14, best lap 14.710) | best model so far: faster than M03 on all unseen tracks, half the off-tracks |
 | 05 | cedc-m05-racingline, **snap2 = ckpt 125** | racing line (K1999-style, 0.30 m margin) + smooth-steering bonus; from M04 final | 17:50–21:00 (stopped early) | strong start (33/60 laps), then fell to ~20/60 after ckpt 125 | snap2: all complete; **mean 16.51 s** (Vegas 15.6, Summit 18.2, re:Invent2018 13.9, 2024 CW 18.4); 14 off-tracks; unseen efficiency **57%**, gap **+9** | 14.78 (Vegas) | **17.877** (uploaded #15, best lap 14.713) | new best: the racing line helps on unseen right-turn tracks; training degraded after this snapshot, so snapshots matter |
 | 05b | cedc-m05b-gentle (snap1 ckpt 134, snap2 ckpt 142, final 144) | racing line blended 50% toward centre + half smoothness bonus; from M05 snap2 | 21:15–23:32 | steady ~32/60 laps for 1 h, then fell (8/20 at 23:16) | snap1: mean 16.99 s, 21 off-tracks, unseen eff. 55%; snap2: mean 18.38 s, 27 off-tracks, 50% | 14.71 (Vegas) | not uploaded | no gain over M05 snap2; both racing-line runs peak after ~1–1.5 h then degrade → next: lower learning rate |
+| 06 | cedc-m06-faster, **snap 03:39 = ckpt 141** | speed 1.3–4.0 m/s, expert grip 5 m/s², pace cap ~4 m/s, **lr 0.0001**; from M05 snap2 | 02:05–05:02 | faster laps (13.6–14.4 s), 5–9/20 laps | snap 03:39: **mean 16.12 s** (Vegas 14.7, Summit 17.5, re:Invent2018 14.1, 2024 CW 18.2); 18 off-tracks; trial spread 0.76 s. Top 3 snapshots 16.05–16.12 | 13.94 (Vegas, snap 02:38) | **23.554** (uploaded #16, best lap 14.510) | best lap improved but the average collapsed (score − best = 9.0 s vs 3.2 s for M05): more off-tracks on the secret track. Local eval predicted the wrong direction → select by off-tracks first |
 
 ## Portal history
 
@@ -22,5 +23,6 @@ One row per trained model. Change **one idea** per model.
 | 13 | 2026-09-30 00:57 | Model 03 ckpt 31 | 100% | 22.508 | 15.706 |
 | 14 | 2026-09-30 17:46 | Model 04 final ckpt 108 | 100% | 18.008 | 14.710 |
 | 15 | 2026-09-30 21:38 | **Model 05 snap2 ckpt 125** | 100% | **17.877** | 14.713 |
+| 16 | 2026-10-01 09:43 | Model 06 snap 03:39 ckpt 141 | 100% | 23.554 | **14.510** |
 
 Leader (2026-09-30): Shallow Learner, 100%, 5.615 / 5.542.
