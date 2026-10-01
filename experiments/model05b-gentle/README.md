@@ -20,4 +20,12 @@ Also raised `term_cond_max_episodes` 1000 → 100000 (stop condition only), so l
 
 ## Results
 
-_To fill in._
+Training 21:15–23:32 (`cedc-m05b-gentle`, 18 simulator restarts, no crashes). Steady at ~32/60 laps for the first hour (Model 05 was already sliding by then), smoothest steering of any model (14.2°/step), then reliability fell (8/20 laps at 23:16).
+
+| Candidate | Vegas | Summit | re:Inv 2018 | re:Inv 2024 CW | Mean | Off-tracks | Unseen eff. |
+|---|---|---|---|---|---|---|---|
+| snap1 (ckpt 134, ~22:25) | 16.46 | 18.05 | 14.46 | 19.00 | 16.99 s | 21 | 55% |
+| snap2 (ckpt 142, ~23:16) | 16.71 | 21.20 | 15.34 | 20.25 | 18.38 s | 27 | 50% |
+| *M05 snap2 (start point)* | *15.61* | *18.16* | *13.94* | *18.35* | *16.51 s* | *14* | *57%* |
+
+**No improvement over its starting point (M05 snap2).** Pattern across both racing-line runs: best after ~1–1.5 h of fine-tuning, then degradation. Hypothesis: learning rate 0.0003 is too high for fine-tuning an already-good model. Next: M05 reward, start from M05 snap2, **lr 0.0001**, snapshots every 30 min.
