@@ -1,0 +1,17 @@
+# Large / generated training artifacts (kept locally, not in git)
+# downloaded checkpoints (~60 MB each)
+models/
+# packaged portal bundles (*.tar.gz, ~60 MB each)
+submissions/
+# raw simulator/trainer logs and metrics per run
+logs/
+# TensorBoard event files (regenerate: python tools/tb_export.py)
+tb/
+# raw evaluation logs (EvaluationMetrics.json is kept)
+evals/**/robomaker.log
+# rendered page previews of the PDF
+report/preview/
+
+# Python
+__pycache__/
+*.pyc
