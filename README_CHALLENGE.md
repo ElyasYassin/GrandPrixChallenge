@@ -20,14 +20,14 @@ You only need a browser. No GPU, Docker, ROS or local ML setup is required.
 |---|---|
 | **Single camera only** | ✅ `"sensor": ["FRONT_FACING_CAMERA"]` |
 | **PPO only** | ✅ `"training_algorithm": "clipped_ppo"` |
-| Train/experiment on the public **Vegas_track** (AWS Summit Raceway) | ✅ All training so far is on `Vegas_track` |
+| Train/experiment on the public **Vegas_track** (AWS Summit Raceway) | ✅ Models 01–07 trained on `Vegas_track` only; from Model 08 also on other public simulator tracks (allowed, see below) |
 | Local infrastructure allowed (e.g. DeepRacer-for-Cloud) | ✅ Explicitly allowed |
 | **Generalize; avoid hard-coding waypoints**, don't memorize one track | ✅ The reward reads `params["waypoints"]` of whatever track it runs on; no fixed indices or coordinates |
 | Keep notes, change one or two things at a time | ✅ `experiments/LOG.md` + per-model READMEs |
 | Generative AI welcome as an assistant; the engineering decisions are the team's | ⚠️ The team should understand and own each design choice |
 | **Physical race: Thursday, October 8, 2026** | Details to come |
 
-**Open question for the organizers:** is training on *other* simulator tracks allowed (for generalization), or only `Vegas_track`? Until we get an answer, we train on Vegas only.
+**Training on other simulator tracks:** allowed (confirmed by the team on 2026-10-01). Models 01–07 used Vegas only; Model 08 onward also trains on the public tracks closest to the secret track (see `team/SECRET_TRACK.md`).
 
 ## 2. Key links
 
