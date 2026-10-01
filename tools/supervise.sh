@@ -26,12 +26,17 @@ end=$(date -d "$STOP_AT" +%s)
 
 # WSL shuts its VM down when no Windows process is attached (even with Docker running inside),
 # which kills training. Keep one idle connection open for as long as we supervise.
-MSYS_NO_PATHCONV=1 wsl.exe -d Ubuntu-22.04 -- bash -c 'exec sleep infinity' > /dev/null 2>&1 &
-KEEPALIVE=$!
-trap 'rm -f "$LOCK"; kill $KEEPALIVE 2>/dev/null' EXIT
-
+start_keepalive() {
+  MSYS_NO_PATHCONV=1 wsl.exe -d Ubuntu-22.04 -- bash -c 'exec sleep infinity' > /dev/null 2>&1 &
+  KEEPALIVE=$!
+}
 # WSL's /tmp is wiped on every WSL restart: (re)install helpers, DRfC temp dir, start MinIO
-wslrun "sed 's/\r$//' '/mnt/c/Users/Elyas/OneDrive - The University of Colorado Denver/Desktop/projects/GrandPrixChallenge/tools/wsl/bootstrap.sh' | bash"
+bootstrap() {
+  wslrun "sed 's/\r$//' '/mnt/c/Users/Elyas/OneDrive - The University of Colorado Denver/Desktop/projects/GrandPrixChallenge/tools/wsl/bootstrap.sh' | bash"
+}
+start_keepalive
+trap 'rm -f "$LOCK"; kill $KEEPALIVE 2>/dev/null' EXIT
+bootstrap
 resumes=0
 simrestarts=0
 
@@ -54,7 +59,27 @@ while true; do
   mem=$(echo "$status" | sed -nE 's/.*mem_mib=([0-9]+).*/\1/p')
   trainer=$(echo "$status" | sed -nE 's/.* trainer=([0-9]+).*/\1/p')
   teps=$(echo "$status" | sed -nE 's/.*trainer_eps=([0-9]+).*/\1/p')
-  if [ -z "$status" ]; then echo "$(date +%T) WSL not responding, retrying"; sleep 60; continue; fi
+  if ! echo "$status" | grep -q "running="; then   # empty, or a wsl.exe error message
+    # seen 2026-10-01: the Ubuntu distribution stopped and would not start again
+    # ("Wsl/Service/CreateInstance/E_FAIL") until `wsl --shutdown`. After 3 failed checks, restart WSL.
+    down=$(( ${down:-0} + 1 ))
+    echo "$(date +%T) WSL not responding ($down)"
+    if [ "$down" -ge 3 ]; then
+      echo "$(date +%T) restarting WSL"; kill $KEEPALIVE 2>/dev/null
+      wsl.exe --shutdown > /dev/null 2>&1; sleep 10
+      start_keepalive; down=0; wsl_restarted=1
+    fi
+    sleep 30; continue
+  fi
+  down=0
+  if [ "${wsl_restarted:-0}" -eq 1 ]; then
+    # /tmp was wiped and every container stopped: reinstall helpers, then resume from the last checkpoint
+    wsl_restarted=0; bootstrap > /dev/null 2>&1
+    resumes=$((resumes + 1))
+    new=$(wslrun "bash /tmp/autoresume.sh" | tail -1)
+    echo "$(date +%T) WSL restarted -> auto-resume #$resumes as $new"
+    last_teps=x; sleep 60; continue
+  fi
   # Stuck trainer: the simulator keeps driving but the trainer stops receiving episodes (seen
   # after a simulator-only restart). No new trainer episode for STALL_MIN minutes -> full resume.
   now=$(date +%s)
@@ -81,6 +106,7 @@ while true; do
   if [ "${exited:-0}" -gt 0 ] || [ "${running:-0}" -eq 0 ] || [ "${trainer:-0}" -eq 0 ]; then
     if [ "$resumes" -ge "$MAX_RESUMES" ]; then echo "SIMULATOR DOWN at $(date +%T), giving up after $resumes resumes"; exit 2; fi
     resumes=$((resumes + 1))
+    wslrun "[ -f /tmp/autoresume.sh ] && echo ok" | grep -q ok || bootstrap > /dev/null 2>&1   # WSL restarted: /tmp is empty
     new=$(wslrun "bash /tmp/autoresume.sh" | tail -1)
     echo "$(date +%T) simulator down ($status) -> auto-resume #$resumes as $new"
     sleep 60
