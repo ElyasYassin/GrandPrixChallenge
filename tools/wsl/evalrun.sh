@@ -24,7 +24,7 @@ dr-start-evaluation -q > /dev/null 2>&1
 sleep 20
 R=$(docker ps -aq --filter name=deepracer-eval-0-robomaker | head -1)
 TRIALS=$(grep "^DR_EVAL_NUMBER_OF_TRIALS=" run.env | cut -d= -f2); TRIALS=${TRIALS:-3}
-end=$(( $(date +%s) + 120 + 90 * TRIALS ))
+end=$(( $(date +%s) + ${EVAL_MAX_S:-$(( 120 + 90 * TRIALS ))} ))   # EVAL_MAX_S: fixed duration (grip tests)
 until [ "$(docker logs $R 2>&1 | grep -c 'Finished evaluation phase')" -ge "$TRIALS" ] || [ -z "$(docker ps -q --filter id=$R)" ] || [ $(date +%s) -ge $end ]; do sleep 5; done
 sleep 5
 docker logs $R > "$OUT/robomaker.log" 2>&1
