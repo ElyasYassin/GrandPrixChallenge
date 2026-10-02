@@ -4,7 +4,7 @@ Each car is one logged evaluation trial (default: the trial with the median lap 
 typical lap, not a lucky one), played back in real time from SIM_TRACE_LOG timestamps. Off-track
 resets show as a red x where the car left the track; the penalty time is in the playback.
 
-Training laps: "<label>=<training robomaker log>#<fwd|rev>[:n]" uses the median of the last n (default 8)
+Training laps: "<label>=<training robomaker log>#<fwd|rev>[:n][@HH:MM]" uses the median of the last n (default 8)
 completed laps in that direction (fwd = the track's waypoint order, like evaluations). Training
 episodes start anywhere on the track, so each lap is re-phased to start at the start/finish line.
 Training actions are sampled (exploration), so these laps are a bit noisier than evaluation laps.
@@ -49,10 +49,11 @@ def _turn(e) -> float:
     return yaw[-1] - yaw[0]
 
 
-def load_training_lap(log: str, direction: str, n: int, center: np.ndarray, fwd_sign: float):
+def load_training_lap(log: str, direction: str, n: int, center: np.ndarray, fwd_sign: float, before: float | None = None):
     """Median of the last n completed laps driven in `direction`, re-phased to start at waypoint 0."""
     eps = [e for _, e in sorted(_parse_trace_file(Path(log)).items())]
-    laps = [[s for s in e if s["status"] != "prepare"] for e in eps if e[-1]["status"] == "lap_complete"]
+    laps = [[s for s in e if s["status"] != "prepare"] for e in eps if e[-1]["status"] == "lap_complete"
+            and (before is None or e[-1]["t"] <= before)]
     want = fwd_sign if direction == "fwd" else -fwd_sign
     laps = [e for e in laps if np.sign(_turn(e)) == np.sign(want)][-n:]
     if not laps:
@@ -77,8 +78,15 @@ def main() -> None:
         label, rest = spec.split("=", 1)
         if "#" in rest:
             log, _, sel = rest.partition("#")
+            sel, _, cutoff = sel.partition("@")            # optional @HH:MM: only laps finished before then (today)
             direction, _, n = sel.partition(":")
-            t, xy, off, done, cnt = load_training_lap(log, direction, int(n or 8), center, fwd_sign)
+            before = None
+            if cutoff:
+                import datetime as _dt
+                h, m = map(int, cutoff.split(":"))
+                day = _dt.datetime.fromtimestamp(Path(log).stat().st_mtime).replace(hour=h, minute=m, second=0)
+                before = day.timestamp()
+            t, xy, off, done, cnt = load_training_lap(log, direction, int(n or 8), center, fwd_sign, before)
             print(f"{label}: training lap ({direction}, median of last {cnt}), {t[-1]:.2f}s")
         else:
             d, _, tr = rest.partition(":")
