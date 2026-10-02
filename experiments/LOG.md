@@ -15,7 +15,7 @@ One row per trained model. Change **one idea** per model.
 | 05b | cedc-m05b-gentle (snap1 ckpt 134, snap2 ckpt 142, final 144) | racing line blended 50% toward centre + half smoothness bonus; from M05 snap2 | 21:15–23:32 | steady ~32/60 laps for 1 h, then fell (8/20 at 23:16) | snap1: mean 16.99 s, 21 off-tracks, unseen eff. 55%; snap2: mean 18.38 s, 27 off-tracks, 50% | 14.71 (Vegas) | not uploaded | no gain over M05 snap2; both racing-line runs peak after ~1–1.5 h then degrade → next: lower learning rate |
 | 06 | cedc-m06-faster, **snap 03:39 = ckpt 141** | speed 1.3–4.0 m/s, expert grip 5 m/s², pace cap ~4 m/s, **lr 0.0001**; from M05 snap2 | 02:05–05:02 | faster laps (13.6–14.4 s), 5–9/20 laps | snap 03:39: **mean 16.12 s** (Vegas 14.7, Summit 17.5, re:Invent2018 14.1, 2024 CW 18.2); 18 off-tracks; trial spread 0.76 s. Top 3 snapshots 16.05–16.12 | 13.94 (Vegas, snap 02:38) | **23.554** (uploaded #16, best lap 14.510) | best lap improved but the average collapsed (score − best = 9.0 s vs 3.2 s for M05): more off-tracks on the secret track. Local eval predicted the wrong direction → select by off-tracks first |
 | 07 | cedc-m07-reliable (snapshots 12:31, 13:01, 13:32, 14:02) | off-track penalty −20 + edge-safety factor; from M06 snap 03:39 | 11:45–14:03 (stopped early: flat for 2 h) | flat ~55% mean, ~18–27 laps/60 | **5 trials × 6 tracks** (Summit, rI2024 CW/CCW, reInvent2019, reinvent_base, Vegas). M05 snap2 reference: mean 17.42 s, 45 off-tracks. 12:31: 16.90 s, 46; 14:02: 17.47 s, 55 (fewest on stand-ins, 28 vs 30); 13:32: 18.60 s, 74 | 14.52 (Vegas) | not uploaded | no clear gain over M05. Snapshots differ a lot (13:32 best on Vegas, worst on stand-ins). Note: local evals before 2026-10-01 14:10 were 3 trials, not 5 (script bug) |
-| 08 | cedc-m08-<leg> (track rotation) | **discrete action space** (15 actions from the expert's command bands), from scratch; trained on Vegas + 2024_reinvent_champ_cw + 2022_summit_speedway in rotation | 15:53 → ~06:00 | — | — | — | — | why: M04–M07 spend ~50% of steps at full lock and ~55% at 1.3 m/s because they imitate the expert imprecisely (`model08-discrete/README.md`) |
+| 08 | cedc-m08-<leg> (track rotation) | **discrete action space** (15 actions from the expert's command bands), from scratch; trained on Vegas + 2024_reinvent_champ_cw + 2022_summit_speedway in rotation | 15:53 → ~06:15 | Vegas phase end (ckpt 33): ~50% laps | Vegas 5 trials: mean 13.73 s, 2 off-tracks (M05: 15.44, 0) | 12.66 (Vegas eval) | **16.693** (uploaded #17, best lap 13.928; rank 2) | why: M04–M07 spend ~50% of steps at full lock and ~55% at 1.3 m/s because they imitate the expert imprecisely (`model08-discrete/README.md`) |
 
 ## Portal history
 
@@ -25,6 +25,7 @@ One row per trained model. Change **one idea** per model.
 | 13 | 2026-09-30 00:57 | Model 03 ckpt 31 | 100% | 22.508 | 15.706 |
 | 14 | 2026-09-30 17:46 | Model 04 final ckpt 108 | 100% | 18.008 | 14.710 |
 | 15 | 2026-09-30 21:38 | **Model 05 snap2 ckpt 125** | 100% | **17.877** | 14.713 |
-| 16 | 2026-10-01 09:43 | Model 06 snap 03:39 ckpt 141 | 100% | 23.554 | **14.510** |
+| 16 | 2026-10-01 09:43 | Model 06 snap 03:39 ckpt 141 | 100% | 23.554 | 14.510 |
+| 17 | 2026-10-01 ~20:10 | **Model 08 Vegas end (17:53) ckpt 33**, discrete | 100% | **16.693** | **13.928** |
 
 Leader (2026-09-30): Shallow Learner, 100%, 5.615 / 5.542.

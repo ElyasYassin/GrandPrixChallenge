@@ -100,3 +100,4 @@ Non-upload questions for the humans:
 Format: `date · who · upload / observation · what it implies for B1–B6`
 
 - 2026-10-01 · Elyas · 5 probes above (M02–M06) · basis for B1–B6
+- 2026-10-01 · Elyas · M08 Vegas-end (discrete actions, Vegas only, <2 h from scratch; Vegas eval best 12.66, mean 13.73) → portal **16.693 / 13.928**, score − best 2.77 s (M05 3.16 s) · secret/Vegas best-lap ratio **1.10** (M05 1.00, M06 1.04): this model gains less on the secret track than on Vegas; consistent with B1 (longer) and with corners Vegas doesn't train (B3); off-track cost similar to M05 (B4 unchanged)
