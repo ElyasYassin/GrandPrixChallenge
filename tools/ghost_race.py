@@ -4,6 +4,11 @@ Each car is one logged evaluation trial (default: the trial with the median lap 
 typical lap, not a lucky one), played back in real time from SIM_TRACE_LOG timestamps. Off-track
 resets show as a red x where the car left the track; the penalty time is in the playback.
 
+Training laps: "<label>=<training robomaker log>#<fwd|rev>[:n]" uses the median of the last n (default 8)
+completed laps in that direction (fwd = the track's waypoint order, like evaluations). Training
+episodes start anywhere on the track, so each lap is re-phased to start at the start/finish line.
+Training actions are sampled (exploration), so these laps are a bit noisier than evaluation laps.
+
 Usage:
   python tools/ghost_race.py <track> <out.mp4> "<label>=<eval dir>[:trial]" ...
   e.g. python tools/ghost_race.py Vegas_track videos/vegas.mp4 "M02=evals/m02-best-Vegas_track" "M05=evals/m05-m05-snap2-Vegas_track"
@@ -39,15 +44,47 @@ def load_lap(eval_dir: str, trial: int | None):
     return t, xy, off, done, len(eps), trial
 
 
+def _turn(e) -> float:
+    yaw = np.unwrap(np.radians([s["yaw"] for s in e]))
+    return yaw[-1] - yaw[0]
+
+
+def load_training_lap(log: str, direction: str, n: int, center: np.ndarray, fwd_sign: float):
+    """Median of the last n completed laps driven in `direction`, re-phased to start at waypoint 0."""
+    eps = [e for _, e in sorted(_parse_trace_file(Path(log)).items())]
+    laps = [[s for s in e if s["status"] != "prepare"] for e in eps if e[-1]["status"] == "lap_complete"]
+    want = fwd_sign if direction == "fwd" else -fwd_sign
+    laps = [e for e in laps if np.sign(_turn(e)) == np.sign(want)][-n:]
+    if not laps:
+        raise SystemExit(f"no completed {direction} laps in {log}")
+    e = sorted(laps, key=lambda e: e[-1]["t"] - e[0]["t"])[len(laps) // 2]
+    t = np.array([s["t"] for s in e]) - e[0]["t"]
+    xy = np.array([[s["x"], s["y"]] for s in e])
+    k = int(np.argmin(((xy - center[0]) ** 2).sum(1)))           # closest point to the start line
+    dt = np.diff(t, append=t[-1] + np.median(np.diff(t)))
+    xy = np.vstack([xy[k:], xy[:k]])
+    t = np.concatenate([[0.0], np.cumsum(np.concatenate([dt[k:], dt[:k]]))[:-1]])
+    return t, xy, [], True, len(laps)
+
+
 def main() -> None:
     track_name, out = sys.argv[1], Path(sys.argv[2])
     cars = []
+    center = load_track(track_name)[0]
+    fwd_sign = np.sign(_turn([{"yaw": float(np.degrees(np.arctan2(*(np.roll(center, -1, 0) - center)[i][::-1])))}
+                              for i in range(len(center))]))
     for k, spec in enumerate(sys.argv[3:]):
         label, rest = spec.split("=", 1)
-        d, _, tr = rest.partition(":")
-        t, xy, off, done, n, trial = load_lap(d, int(tr) if tr else None)
+        if "#" in rest:
+            log, _, sel = rest.partition("#")
+            direction, _, n = sel.partition(":")
+            t, xy, off, done, cnt = load_training_lap(log, direction, int(n or 8), center, fwd_sign)
+            print(f"{label}: training lap ({direction}, median of last {cnt}), {t[-1]:.2f}s")
+        else:
+            d, _, tr = rest.partition(":")
+            t, xy, off, done, cnt, trial = load_lap(d, int(tr) if tr else None)
+            print(f"{label}: trial {trial + 1}/{cnt}, {t[-1]:.2f}s, {len(off)} off-track")
         cars.append(dict(label=label, t=t, xy=xy, off=off, done=done, color=COLORS[k % len(COLORS)]))
-        print(f"{label}: trial {trial + 1}/{n}, {t[-1]:.2f}s, {len(off)} off-track")
     t_end = max(c["t"][-1] for c in cars) + 1.5
     width = max(len(c["label"]) for c in cars)
 

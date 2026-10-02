@@ -1,6 +1,9 @@
 # usage: evalrun.sh <prefix> <world> <out-name> [checkpoint]
 #   checkpoint: a name like 31_Step-21752 (default: the run's "best"); race rules come from run.env
 PREFIX=$1; WORLD=$2; NAME=$3; CKPT=${4:-}
+# never evaluate while training runs: two simulators on one host cross-talk (their clocks mix; seen
+# 2026-10-01: the eval car never spawned and the training episodes got garbage times/progress)
+if [ -n "$(docker ps -q --filter name=deepracer-0-robomaker)" ]; then echo "training is running: not evaluating"; exit 3; fi
 OUT="/mnt/c/Users/Elyas/OneDrive - The University of Colorado Denver/Desktop/projects/GrandPrixChallenge/evals/$NAME"; mkdir -p "$OUT"
 sudo() { "$@"; }; export -f sudo
 A="aws --profile minio --endpoint-url http://localhost:9000"

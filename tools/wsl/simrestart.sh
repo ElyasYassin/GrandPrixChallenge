@@ -11,5 +11,5 @@ for f in $($A s3 ls s3://bucket/$PREFIX/metrics/ | awk '{print $4}' | grep "^Tra
 done
 S=$(docker ps -q --filter name=algo-)
 before=$(docker logs $S 2>&1 | grep -c "Training>")
-for R in $(docker ps -aq --filter name=robomaker); do docker restart $R > /dev/null; done
+for R in $(docker ps -aq --filter name=deepracer-0-robomaker); do docker restart $R > /dev/null; done
 echo "restarted simulator (part $n saved, trainer at $before episodes)"

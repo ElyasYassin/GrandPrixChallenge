@@ -6,7 +6,7 @@ mkdir -p "$OUT"
 save() { docker logs "$1" > /tmp/savelog.tmp 2>&1; [ -s /tmp/savelog.tmp ] && cp /tmp/savelog.tmp "$2"; }
 S=$(docker ps -aq --filter name=algo- | head -1)
 [ -n "$S" ] && save "$S" "$OUT/sagemaker.log"
-i=0; for R in $(docker ps -aq --filter name=robomaker); do save "$R" "$OUT/robomaker_$i.log"; i=$((i+1)); done
+i=0; for R in $(docker ps -aq --filter name=deepracer-0-robomaker); do save "$R" "$OUT/robomaker_$i.log"; i=$((i+1)); done
 rm -f "$OUT/robomaker.log"
 A="aws --profile minio --endpoint-url http://localhost:9000"
 $A s3 cp --recursive s3://bucket/$PREFIX/metrics/ "$OUT/" --exclude "*" --include "TrainingMetrics*.json" >/dev/null 2>&1
