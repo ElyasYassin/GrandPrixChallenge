@@ -48,6 +48,13 @@ while true; do
   wslrun "bash /tmp/savelogs.sh" > /dev/null 2>&1
   python tools/tb_export.py 2>&1 | grep -E "skipped"
   ensure_tensorboard
+  # WSL's virtual disk lives on C:. When C: filled up (2026-10-02 01:44) Linux got I/O errors and
+  # crashed; stop cleanly (checkpoints are safe in MinIO) before that happens.
+  free_mib=$(df -BM /c | awk 'NR==2 {gsub("M","",$4); print $4}')
+  if [ -n "$free_mib" ] && [ "$free_mib" -lt "${MIN_FREE_MIB:-2000}" ]; then
+    wslrun "bash /tmp/drstop.sh"
+    echo "STOPPED at $(date +%T): only ${free_mib} MiB free on C:"; exit 4
+  fi
   if [ "$(date +%s)" -ge "$end" ]; then
     wslrun "bash /tmp/drstop.sh"
     python tools/tb_export.py > /dev/null 2>&1

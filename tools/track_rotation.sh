@@ -34,6 +34,8 @@ for leg in "$@"; do
     fi
   done
   tail -1 "$sup_out" >> "$LOGF"
+  wait $sup; rc=$?
+  if [ "$rc" -eq 4 ]; then echo "== $(date +%T) rotation stopped: C: is almost full" >> "$LOGF"; exit 4; fi
   # supervisor auto-resumes may have renamed the run (<prefix>-2, ...): continue from whatever is current
   PRE=$(curprefix); CKPT=last
   wslrun "bash /tmp/snapshot.sh $PRE cedc-${LABEL}-${tag}-end" >> "$LOGF" 2>&1

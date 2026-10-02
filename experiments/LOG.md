@@ -30,3 +30,4 @@ One row per trained model. Change **one idea** per model.
 | 18 | 2026-10-01 22:38 | **Model 08 vegas2 21:47 ckpt 70**, discrete, Vegas → rI2024 → Summit → Vegas | 100% | **10.824** | **10.225** |
 
 Leader (2026-09-30): Shallow Learner, 100%, 5.615 / 5.542.
+| 09 | cedc-m09-<leg> (track rotation) | **speed push**: distance reward (15 × % of lap per step), lap bonus ∝ speed², off-track −5; from M08 vegas2-2147; stand-in tracks only | 02:11 → ~07:15 | — | — | — | — | Model 08 got slower overnight (+1 s/lap) because slow laps earned more total reward |
