@@ -103,8 +103,17 @@ while true; do
   # episodes (seen at 58/60). So above MAX_SIM_MEM_MIB wait for a multiple of EPISODES_PER_ITER
   # trainer episodes, unless memory passes HARD_SIM_MEM_MIB.
   at_boundary=0; [ -n "${teps:-}" ] && [ "${teps}" -gt 0 ] && [ $((teps % EPISODES_PER_ITER)) -eq 0 ] && at_boundary=1
+  # Simulator-only restarts that bring no new episodes (seen 2026-10-02: Gazebo's get_model_states
+  # timed out after every restart for 30 min) -> escalate to a full resume from the last checkpoint.
+  if [ "${trainer:-0}" -gt 0 ] && [ "${exited:-0}" -gt 0 ] && [ "${teps:-0}" = "${restart_teps:-x}" ] && [ "${fruitless:-0}" -ge 3 ]; then
+    resumes=$((resumes + 1)); fruitless=0; restart_teps=x
+    new=$(wslrun "bash /tmp/autoresume.sh" | tail -1)
+    echo "$(date +%T) simulator restarts not helping (trainer stuck at ${teps}) -> full resume #$resumes as $new"
+    last_teps=x; sleep 60; continue
+  fi
   if [ "${trainer:-0}" -gt 0 ] && { [ "${exited:-0}" -gt 0 ] || { [ "${mem:-0}" -gt "$MAX_SIM_MEM_MIB" ] && { [ "$at_boundary" -eq 1 ] || [ "${mem:-0}" -gt "$HARD_SIM_MEM_MIB" ]; }; }; }; then
     simrestarts=$((simrestarts + 1))
+    if [ "${teps:-0}" = "${restart_teps:-x}" ]; then fruitless=$(( ${fruitless:-0} + 1 )); else fruitless=1; restart_teps=$teps; fi
     msg=$(wslrun "bash /tmp/simrestart.sh" | tail -1)
     echo "$(date +%T) simulator ${mem} MiB, exited=${exited} -> $msg (#$simrestarts)"
     sleep 60
