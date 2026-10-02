@@ -14,12 +14,19 @@ ROOT="$(cd "$(dirname "$0")/.." && pwd)"; cd "$ROOT"
 LOGF="logs/${LABEL}_rotation.txt"
 wslrun() { MSYS_NO_PATHCONV=1 timeout 300 wsl.exe -d Ubuntu-22.04 -- bash -c "$1" | tr -d '\0\r'; }
 curprefix() { wslrun "grep ^DR_LOCAL_S3_MODEL_PREFIX= ~/deepracer-for-cloud/run.env | cut -d= -f2"; }
+# Keep WSL alive for the whole rotation: between legs no supervisor is attached, WSL went idle and
+# shut down, /tmp was wiped and start_run.sh "did not exist" (2026-10-02: every leg kept the first track).
+MSYS_NO_PATHCONV=1 wsl.exe -d Ubuntu-22.04 -- bash -c 'exec sleep infinity' > /dev/null 2>&1 &
+KEEPALIVE=$!
+trap 'kill $KEEPALIVE 2>/dev/null' EXIT
 # install the current helpers (start_run.sh runs before supervise.sh bootstraps)
 wslrun "sed 's/\r$//' '/mnt/c/Users/Elyas/OneDrive - The University of Colorado Denver/Desktop/projects/GrandPrixChallenge/tools/wsl/bootstrap.sh' | bash > /dev/null"
 for leg in "$@"; do
   IFS=: read -r world tag minutes lr <<< "$leg"
   prefix="cedc-${LABEL}-${tag}"
   stop_at=$(date -d "+${minutes} minutes" +%H:%M)
+  # reinstall helpers if WSL restarted anyway (start_run.sh must exist before the leg starts)
+  wslrun "[ -f /tmp/start_run.sh ] && echo ok" | grep -q ok || wslrun "sed 's/\r$//' '/mnt/c/Users/Elyas/OneDrive - The University of Colorado Denver/Desktop/projects/GrandPrixChallenge/tools/wsl/bootstrap.sh' | bash > /dev/null"
   { echo "== $(date +%T) leg $tag: $world for $minutes min, lr ${lr:-${LR:-unchanged}} (until $stop_at), from $PRE ($CKPT)"
     MSYS_NO_PATHCONV=1 wsl.exe -d Ubuntu-22.04 -- bash /tmp/start_run.sh "$EXP" "$prefix" "$PRE" "$CKPT" "$world" "${lr:-${LR:-}}" | tr -d '\0'; } >> "$LOGF" 2>&1
   sup_out="logs/${LABEL}_${tag}_supervise.txt"
