@@ -29,7 +29,8 @@ One row per trained model. Change **one idea** per model.
 | 17 | 2026-10-01 ~20:10 | Model 08 Vegas end (17:53) ckpt 33, discrete, Vegas only | 100% | 16.693 | 13.928 |
 | 18 | 2026-10-01 22:38 | Model 08 vegas2 21:47 ckpt 70, discrete, Vegas → rI2024 → Summit → Vegas | 100% | 10.824 | 10.225 |
 | 20 | 2026-10-02 10:34 | Model 09 champ2-0515 ckpt 94 (rI2024 only, ~3 h) | 100% | 11.286 | 11.014 |
-| 21 | 2026-10-02 10:34 | **Model 09 summit1-0414 ckpt 87** (rI2024 only, ~2 h; fastest training stretch) | 100% | **10.167** | **9.985** |
+| 21 | 2026-10-02 10:34 | Model 09 summit1-0414 ckpt 87 (rI2024 only, ~2 h; fastest training stretch) | 100% | 10.167 | 9.985 |
+| 22 | 2026-10-02 19:19 | **Model 10 summit1-end ckpt 114** (real-car expert, faster actions; ~30 min rI2024 + 60 min Summit; ~20–30% training laps) | 100% | **10.096** | **9.902** |
 
 Leader (2026-09-30): Shallow Learner, 100%, 5.615 / 5.542.
 | 09 | cedc-m09-<leg> (track rotation) | **speed push**: distance reward (15 × % of lap per step), lap bonus ∝ speed², off-track −5; from M08 vegas2-2147; stand-in tracks only | 02:11 → 07:21 (**all on 2024_reinvent_champ_cw**: the track switches failed, see FINDINGS) | laps 20% → ~70%; lap 15.5–15.9 s (M08 2nd round there: 16.0–16.5 s) | not evaluated yet | 14.4 (training) | **10.167** (#21, summit1-0414 ckpt 87, best lap 9.985); 11.286 (#20, champ2-0515 ckpt 94) | stopped M08's slow drift and much more reliable, but not faster than M08's first round on this track |
