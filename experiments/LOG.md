@@ -36,6 +36,7 @@ One row per trained model. Change **one idea** per model.
 | 29 | 2026-10-03 18:26 | Model 10 mixed run c2-end ckpt 150 (best + rI2024 30 / Vegas 20 / rI2024 30 min) | 100% | 13.920 | 10.497 |
 | 30 | 2026-10-03 18:27 | Model 10 mixed run s1-end ckpt 157 (… + Summit 20 min) | 100% | 10.494 | 10.356 |
 | 33 | 2026-10-04 13:05 | **Model 10 variety c2-end ckpt 199** (best + 40 min each: rI2024, Vegas, reInvent2019_wide, Summit, reinvent_base, Canada, rI2024; lr 0.0001) | 100% | **7.130** | **6.740** |
+| 32 | 2026-10-04 13:05 | Model 10 variety w2-end ckpt 217 (c2-end + Vegas 40 min + reInvent2019_wide 40 min) | 100% | 10.425 | 6.865 |
 
 Leader (2026-09-30): Shallow Learner, 100%, 5.615 / 5.542.
 | 09 | cedc-m09-<leg> (track rotation) | **speed push**: distance reward (15 × % of lap per step), lap bonus ∝ speed², off-track −5; from M08 vegas2-2147; stand-in tracks only | 02:11 → 07:21 (**all on 2024_reinvent_champ_cw**: the track switches failed, see FINDINGS) | laps 20% → ~70%; lap 15.5–15.9 s (M08 2nd round there: 16.0–16.5 s) | not evaluated yet | 14.4 (training) | **10.167** (#21, summit1-0414 ckpt 87, best lap 9.985); 11.286 (#20, champ2-0515 ckpt 94) | stopped M08's slow drift and much more reliable, but not faster than M08's first round on this track |
