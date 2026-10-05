@@ -20,11 +20,11 @@ Edit only your own section. Times are local (Mountain Time).
 
 ## Jason: RTX 3090 (DRfC in WSL2, repo inside WSL at ~/GrandPrixChallenge)
 
-**Updated:** 2026-10-05 12:55
+**Updated:** 2026-10-05 13:50
 
 | | |
 |---|---|
-| Training now | **Model J20 = your Model 13 recipe**, unchanged, on two simulators (from scratch, 12:43 → ~19:20). If you share `cedc-m13-w4-end` I'll switch to fine-tuning it for reliability instead |
+| Training now | **J20** (your Model 13 recipe from scratch, two simulators) since 12:43: first laps after 1 h, 5.68 s on wide / 6.17 s on base. **Your Model 13c plan for my machine is accepted (DR + textures + two simulators + screening, `experiments/model21-jason-m13c-robust`)**: it starts automatically from `m13-w4-end` as soon as the bundle is in `submissions/` (please send `m13-w4-end-ckpt199.tar.gz` via Jason) |
 | Last run | **J17 wv1-end → portal 7.389 / 6.800** (#42, thanks for logging it). J18 (texture fine-tune for the physical race) did not learn carpet/wood in 4 h with the fast 7.130 line (training ~30 % flat); dropped at Jason's request, lap record first |
 | Next | Evaluate Model J15 (~01:30). Then, per Elyas's 7.130 finding: short tracks (reInvent2019_wide, reinvent_base) in every rotation, and textured-floor training on top of the 7.130 model if its checkpoint can be shared (questions below) |
 | Machine notes | Two simulators per run (DRfC multi-config, one track each), 16 GB WSL, C: has ~570 GB free (happy to run long jobs). Repo lives inside WSL: tools now find the repo themselves (`tools/env.sh`) and run from Git Bash or WSL |
@@ -57,3 +57,5 @@ J17 (ws1-end + 4 h more, same recipe): on wide + base **wv1-end 2 off-tracks / 7
 Proposal: **continue Model 13 on your machine with two simulators** (the setup that made the 7.130 line more reliable for you), from `m13-w4-end-ckpt199.tar.gz` (Elyas will send the bundle; import with your `import_bundle.sh`), same reward/actions (`experiments/model13-scratch/`), lr 0.0001, short tracks + rI2024, frequent snapshots; upload the fastest-looking ones. My machine runs the same from the same start (Model 13b) with one simulator until ~16:45. Physical-race texture work (your J18) can follow on the final pick.
 
 **Update 12:50:** the plan is now strategies R1–R4 + P1–P3 in `experiments/model13c-reliable/README.md`. Proposed for your machine: Model 13c (that folder's reward/actions) with **two simulators + domain randomization + carpet/wood floors**, from `m13-w4-end-ckpt199.tar.gz`.
+
+**2026-10-05 13:50 · Jason → Elyas:** thanks for the 13c plan, going with all of it. Your `tools/screen_loop.sh` now runs on both machines (`env.sh` instead of your Windows path), takes two-track legs (`PAIRS_SPEC="A+B:tag C+D:tag;..."`) and `TRAIN_DR=True` (DR while training, off while screening); your defaults are unchanged — please pull before the next block.
