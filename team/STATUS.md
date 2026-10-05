@@ -31,12 +31,19 @@ Edit only your own section. Times are local (Mountain Time).
 
 **Naming:** my experiments are `model11-jason-*` … `model15-jason-*`; in the LOG I call them **J11–J15** so they don't clash with Elyas's Models 11/11b/11c.
 
-### Questions for Elyas (from Jason's machine, 2026-10-04 20:15)
+### For Elyas (from Jason's machine, updated 2026-10-05 08:40)
 
-1. ~~**Can you share the 7.130 checkpoint?**~~ Received (all bundles), thanks — J16 is training on it. e.g. `tools/wsl/fetchmodel.sh cedc-m10v-c2-end` → zip `models/cedc-m10v-c2-end/model` (~60 MB) via OneDrive. I'd fine-tune it with the textured-floor recipe (J13: off-tracks on carpet/wood/concrete 27 → 4, see FINDINGS) for the **physical race**, keeping your short tracks in the mix.
-2. **Our expert fixes overlap.** Your 11c (pure pursuit, measured geometry) and my J15 (Stanley tracker on the racing line, `experiments/model15-jason-path`) attack the same twitchy expert. Closed loop (8° noise, 5 tracks, measured 0.34 m geometry) mine went 40.8 → 36.9 s lap total, off-tracks 3.0 → 1.0. Suggest: whichever evaluates better on the short tracks, we both use. Can you post 11c's eval / portal numbers when you have them?
-3. **Your C: drive is at ~2.8 GB.** Want me to take some training load? I can run two tracks at once (two simulators) and have ~570 GB free. Tell me a run (start checkpoint + tracks) and I'll claim it here.
-4. **Shared tools changed** (commit "Jason's machine: …"): scripts no longer hard-code your Windows path (`tools/env.sh`; Git Bash path /c/Users/… is converted to /mnt/c/… for WSL), and `track_rotation.sh` accepts `A+B` worlds for two simulators. Single-track runs behave as before, but please pull and do one `bash tools/supervise.sh` dry start to confirm on your side. Your crash-dump cleanup is merged.
-5. **Physical race (Oct 8):** do we know anything about the real track (surface, colour, width, lighting)? My textured-floor results suggest the floor look matters a lot.
-6. **Portal:** my best (J13 `wooc1-end`, 0 off-tracks on 6 tracks locally, but ~11-12 s laps on 17-25 m tracks) is much slower than the 7.130 line. Worth uploading as a *reliability probe*, or not worth the slot?
+**Your finding "pace is settled at ~6.8 s, off-tracks decide the score" matches what my runs improved.** J16b = your 7.130 model (`cedc-m10v-c2-end`, from your bundle) + **your own settings** (M10 reward, no DR, plain floors, short-track mix, lr 0.0001), the only difference being **two simulators** (two tracks per batch). Same local eval for both (4 tracks × 3 trials, DR off, 1 s penalties):
 
+| | off-tracks / 12 laps | mean | reInvent2019_wide | reinvent_base |
+|---|---|---|---|---|
+| your 7.130 model | 24 | 11.19 s | 8.39 s, 3 off | 11.07 s, 8 off |
+| **J16b ws1-end** | **10** | **10.01 s** | 7.65 s, 0 off | 8.89 s, 3 off |
+
+J17 (ws1-end + 4 h more, same recipe) is being evaluated now; first snapshots are faster again on wide/base (e.g. wv1-end 6.66 s / 0 off, 8.82 s / 2 off). Bundles: `submissions/cedc-m16b-jason-ws1-end.tar.gz` (+ `…-wbo1-end`); Jason uploads to the portal.
+
+1. ~~Share the 7.130 checkpoint~~ — received, thanks. Note for imports: portal bundles name the checkpoint without `.ckpt` and my MinIO dropped the 47 MB weights in a multipart upload; `tools/wsl/import_bundle.sh` handles both.
+2. ~~11c vs my J15 expert~~ — both dropped (yours: slower on the portal; mine: worse in training). Agreed: the expert line is closed.
+3. **Want me to keep running your recipe with two simulators** (I have ~570 GB free and a free 3090 most of the time)? Tell me a start checkpoint + tracks and I'll claim it here.
+4. **Physical race (Oct 8):** your 7.130 model leaves the carpet floor 4–5× per lap (wide: 1–2). My texture recipe (J13: carpet/wood in training, off-tracks 27 → 4, held-out concrete 12 → 4) could be applied to the final portal pick before the race. Do we know anything about the real track surface?
+5. **Shared tools changed** (two simulators via `world A+B`, no hard-coded Windows path via `tools/env.sh`; single-track runs behave as before). Please do one dry `bash tools/supervise.sh` start after pulling.
