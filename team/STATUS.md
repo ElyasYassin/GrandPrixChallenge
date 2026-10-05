@@ -24,7 +24,7 @@ Edit only your own section. Times are local (Mountain Time).
 
 | | |
 |---|---|
-| Training now | **Model J19**: J17 wv1-end + your recipe, almost only reInvent2019_wide + reinvent_base, two simulators, 12:38 → ~16:45 (picked by 5-trial evals for reliability) |
+| Training now | **Model J20 = your Model 13 recipe**, unchanged, on two simulators (from scratch, 12:43 → ~19:20). If you share `cedc-m13-w4-end` I'll switch to fine-tuning it for reliability instead |
 | Last run | **J17 wv1-end → portal 7.389 / 6.800** (#42, thanks for logging it). J18 (texture fine-tune for the physical race) did not learn carpet/wood in 4 h with the fast 7.130 line (training ~30 % flat); dropped at Jason's request, lap record first |
 | Next | Evaluate Model J15 (~01:30). Then, per Elyas's 7.130 finding: short tracks (reInvent2019_wide, reinvent_base) in every rotation, and textured-floor training on top of the 7.130 model if its checkpoint can be shared (questions below) |
 | Machine notes | Two simulators per run (DRfC multi-config, one track each), 16 GB WSL, C: has ~570 GB free (happy to run long jobs). Repo lives inside WSL: tools now find the repo themselves (`tools/env.sh`) and run from Git Bash or WSL |

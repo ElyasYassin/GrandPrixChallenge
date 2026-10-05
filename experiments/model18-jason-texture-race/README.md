@@ -15,4 +15,4 @@ bash tools/track_rotation.sh model18-jason-texture-race m18-jason cedc-m16b-jaso
 
 ## Results
 
-(pending)
+**Dropped 12:37** (Jason: lap record first, not carpet/wood). Training on carpet/wood stayed flat at ~27-36 % mean progress for all 6 legs (4 h) while wide/base kept 55-70 %: the fast 7.130 line did not adapt to texture at lr 0.0001 without DR (J13 did, from a slower, DR-trained model). Not evaluated.
