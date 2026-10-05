@@ -26,4 +26,4 @@ Evaluation (same as J16b: 4 tracks × 3 trials, DR off, 1 s penalties; `logs/m17
 | wb2-end | 14 / 10.55 s | 4 / 8.43 s | 6.93 / 0 | 9.93 / 4 | 13.20 / 5 | 12.12 / 5 |
 | wb1-end | 18 / 11.50 s | 5 / 8.98 s | 8.34 / 2 | 9.63 / 3 | 18.12 / 12 | 9.91 / 1 |
 
-J17 is the fastest and cleanest on the short tracks; ws1-end stays the most reliable over all four. Packaged: `submissions/cedc-m17-jason-wv1-end.tar.gz`, `…-br1-end.tar.gz`.
+**Portal: wv1-end → 7.389 / 6.800 (#42)**, close to the 7.130 model (7.130 / 6.740) but not better: better local reliability did not move the secret-track score (Elyas: the 7.130 line has plateaued at ~6.7–6.8 s). J17 is the fastest and cleanest on the short tracks locally; ws1-end stays the most reliable over all four. Packaged: `submissions/cedc-m17-jason-wv1-end.tar.gz`, `…-br1-end.tar.gz`.
