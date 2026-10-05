@@ -1,42 +1,8 @@
+# J21 (jason): the 7.130 model's reward (Model 10) + Elyas's Model 13c speed-scaled off-track penalty:
+# leaving the track at 4 m/s costs 2x leaving at 2 m/s, which favours braking before corners.
+#
 import math
 
-# Model 13c: Model 13 + a speed-scaled off-track penalty (R2). Model 13 reached a 6.333 s lap on the
-# secret track but lost ~3 s per bad trial to off-tracks. Leaving the track at 5 m/s now costs 2.5x
-# more than at 2 m/s (penalty = -OFFTRACK_PER_MPS * speed), which favours braking before corners.
-#
-# Model 13: everything we learned, from scratch, so the wiggle never becomes a habit.
-# Model 11/11b/11c could not train the wiggle out of the 7.130 model's line (wheels straight on ~2% of
-# straight steps after 7 h of fixes). This model starts from random weights with:
-#  - Model 12's limits: grip 9 m/s^2, top speed 5 m/s (expert ~8-13% faster than the 7.130 line)
-#  - Model 11c's pure-pursuit expert with the measured car geometry (calmer steering)
-#  - straight-line braking (straight at 2.5), and only "straight" reaches 5.0 m/s
-#  - Model 11b's straight bonus and steering-flip penalty
-#  - trained on the short tracks + re:Invent 2024 from the start (what produced the 7.130 model)
-#
-# Model 11c: a calmer expert. Replaying Model 11b's laps showed the expert asked for a median of 30 deg
-# (full lock) on straights and said "straight" only 7% of the time: it set steering = heading error to
-# the target point, which over-steers ~2x for this car. Now it uses pure pursuit with the measured
-# geometry: steer = atan(2 * WHEELBASE * sin(alpha) / distance). Closed-loop check (measured car,
-# 5 deg noise): same lap times, steering flips about halved, full lock 15-19% -> 3-10%.
-# Keeps Model 11b's straight bonus and flip penalty.
-#
-# Model 11b: make "straight" actually pay. After 1.5 h, Model 11 still had its wheels straight on only
-# 1-2% of straight-section steps (3-4 left/right flips per second) and braked while turning 99% of
-# the time: the imitation reward scores 6 deg about as well as 0 deg when the expert asks for a small
-# correction. Changes vs Model 11 (same actions):
-#  1. STRAIGHT_BONUS when the expert's steering is small and the car's wheels are straight.
-#  2. FLIP_PENALTY when the steering changes side (left <-> right) between consecutive steps.
-#  3. Trained at lr 0.0003 for the first phases so the habit can change.
-#
-# Model 11: brake in a straight line, stop wiggling. Model 10's best snapshot (portal 7.130) still
-# wiggled: on straights the wheels were off-centre on 98% of steps with ~3-4 left/right flips per
-# second, and 100% of its braking happened while steering >= 12 deg. Cause: its action set had no
-# slow straight action (slowest straight was 3.0 m/s), and "6 deg at 4.0" was as fast as "straight at
-# 4.0". Changes vs Model 10 (same 15 actions, so it fine-tunes from the 7.130 model):
-#  1. Actions: straight 3.0 -> 2.0 and straight 3.5 -> 3.0 (straight-line braking), 6 deg at 4.0 -> 3.5
-#     (only straight reaches 4.0).
-#  2. Smoothness bonus weight 0.5 -> 1.0.
-#
 # Model 10: the real car. A grip test (tools/grip_sweep.sh: fixed steering + speed circles) showed the
 # simulated car turns about twice as wide as our expert assumed (radius ~0.34 m / tan(steer), not
 # 0.165 m / tan(steer)) and holds at least 8 m/s^2 sideways without sliding (we assumed 5). The expert
@@ -70,10 +36,10 @@ import math
 #  2. Smooth hands: a small bonus for small steering changes between steps.
 # Everything is derived from params at runtime, so it works on any track (no hard-coded positions).
 
-MIN_SPEED, MAX_SPEED = 2.5, 5.0   # must match the action space (slowest: 2.5, fastest: straight at 5.0)
+MIN_SPEED, MAX_SPEED = 2.0, 4.0   # must match the action space (slowest action: 30 deg at 2.0 m/s)
 MAX_STEER = 30.0
 STEER_TOLERANCE_DEG = 10.0
-MAX_LAT_ACC = 9.0                 # m/s^2 the expert allows in a turn (grip test: >= 8.4 without sliding; Model 05-09: 5.0)
+MAX_LAT_ACC = 7.0                 # m/s^2 the expert allows in a turn (grip test: >= 8.4 without sliding; Model 05-09: 5.0)
 MAX_BRAKE = 3.0                   # m/s^2 the expert assumes it can slow down at
 PLAN_AHEAD_M = 4.0                # how far ahead the speed profile looks
 WHEELBASE = 0.34                  # m, effective: measured turn radius ~0.34 / tan(steer) (nominal 0.165)
@@ -81,12 +47,9 @@ WHEELBASE = 0.34                  # m, effective: measured turn radius ~0.34 / t
 LINE_MARGIN_M = 0.30              # racing line stays this far inside each edge (0.22 went off 6 of 10 test tracks)
 LINE_ITERATIONS = 2000            # curvature-averaging passes when building the racing line
 SMOOTH_STEER_DEG = 15.0           # steering change per step that earns no smoothness bonus
-STRAIGHT_EXPERT_DEG = 5.0         # expert steering below this counts as "go straight"
-STRAIGHT_BONUS = 1.0              # reward for straight wheels when the expert says straight
-FLIP_PENALTY = 0.5                # penalty for steering left <-> right between consecutive steps
-SMOOTH_WEIGHT = 1.0                 # Model 05-10: 0.5
-OFFTRACK_PER_MPS = 2.0            # off-track reward = -2 x speed (Model 09-13: flat -5)
-OFFTRACK_PENALTY = -5.0           # reward on the step the car leaves the track (Model 07/08: -20)
+SMOOTH_WEIGHT = 0.5
+OFFTRACK_PENALTY = -5.0           # (Model 10; J21 uses the speed-scaled penalty below instead)
+OFFTRACK_PER_MPS = 2.0            # J21 (Elyas's Model 13c R2): off-track reward = -2 x speed
 PROGRESS_WEIGHT = 15.0            # reward per % of the lap covered in one step (~0.3 %/step at 1.5 m/s on 25 m)
 LAP_BONUS = 300.0                 # times (average lap speed / 2 m/s)^2
 SAFE_EDGE_M = 0.25                # full reward while the car centre is >= this far from an edge
@@ -95,7 +58,6 @@ MIN_EDGE_M = 0.10                 # car half-width: at this distance a wheel tou
 _line_cache = {}                  # track signature -> racing line points
 _last = {"steps": None, "steer": None}
 _prog = {"steps": None, "progress": 0.0}
-_flip = {"steps": None, "steer": None}
 
 
 def _lookahead_m(speed):
@@ -204,14 +166,9 @@ def expert_action(params):
     next_idx = params["closest_waypoints"][1]
     speed_now = max(MIN_SPEED, params["speed"])
 
-    # pure pursuit: the arc through the target point needs curvature 2 sin(alpha) / distance;
-    # the car's steering angle for curvature k is atan(WHEELBASE * k)
     target = _point_ahead(line, next_idx, car, _lookahead_m(speed_now))
     bearing = math.degrees(math.atan2(target[1] - car[1], target[0] - car[0]))
-    alpha = math.radians(_angle_diff(bearing, params["heading"]))
-    distance = max(_dist(car, target), 0.05)
-    steer = math.degrees(math.atan(2.0 * WHEELBASE * math.sin(alpha) / distance))
-    steer = max(-MAX_STEER, min(MAX_STEER, steer))
+    steer = max(-MAX_STEER, min(MAX_STEER, _angle_diff(bearing, params["heading"])))
 
     # speed profile on the racing line's (wider) curves
     speed = _speed_limit_ahead(line, next_idx, car)
@@ -245,22 +202,11 @@ def _progress_delta(params):
     return max(0.0, min(2.0, progress - prev_progress))   # clip: resets/glitches never pay
 
 
-def _flipped(params):
-    """True when the steering changed side (left <-> right) since the previous step."""
-    steps, steer = params["steps"], params["steering_angle"]
-    prev_steps, prev_steer = _flip["steps"], _flip["steer"]
-    _flip["steps"], _flip["steer"] = steps, steer
-    if prev_steps is None or steps != prev_steps + 1:
-        return False
-    return steer * prev_steer < 0
-
-
 def reward_function(params):
-    smooth = _smoothness(params)
-    flipped = _flipped(params)     # update the steering memory on every step, even off track
+    smooth = _smoothness(params)  # update the steering memory on every step, even off track
     # note: params["is_reversed"] means "driving the track clockwise", not "wrong way", so don't use it here
     if params["is_offtrack"]:
-        return -OFFTRACK_PER_MPS * max(params["speed"], MIN_SPEED)
+        return -OFFTRACK_PER_MPS * max(params["speed"], MIN_SPEED)   # J21: speed-scaled (Elyas's Model 13c, R2)
     if not params["all_wheels_on_track"]:
         return 1e-3
 
@@ -273,10 +219,6 @@ def reward_function(params):
     speed_score = max(0.0, 1.0 - speed_error / (MAX_SPEED - MIN_SPEED))
 
     reward = 1.0 + 2.0 * steer_score + 1.0 * speed_score + SMOOTH_WEIGHT * smooth
-    if abs(expert_steer) < STRAIGHT_EXPERT_DEG and params["steering_angle"] == 0:
-        reward += STRAIGHT_BONUS
-    if flipped:
-        reward -= FLIP_PENALTY
 
     # edge safety: scale the reward down as the car gets close to an edge (1 at >= SAFE_EDGE_M, 0 at MIN_EDGE_M)
     edge = params["track_width"] / 2.0 - params["distance_from_center"]

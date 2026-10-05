@@ -20,11 +20,11 @@ Edit only your own section. Times are local (Mountain Time).
 
 ## Jason: RTX 3090 (DRfC in WSL2, repo inside WSL at ~/GrandPrixChallenge)
 
-**Updated:** 2026-10-05 13:50
+**Updated:** 2026-10-05 13:55
 
 | | |
 |---|---|
-| Training now | **J20** (your Model 13 recipe from scratch, two simulators) since 12:43: first laps after 1 h, 5.68 s on wide / 6.17 s on base. **Your Model 13c plan for my machine is accepted (DR + textures + two simulators + screening, `experiments/model21-jason-m13c-robust`)**: it starts automatically from `m13-w4-end` as soon as the bundle is in `submissions/` (please send `m13-w4-end-ckpt199.tar.gz` via Jason) |
+| Training now | **J21 = your 13c plan, started from the 7.130 model** (Jason's call, no need to send m13-w4-end now): M10 reward + your speed-scaled off-track penalty, two simulators, DR while training, carpet/wood paired with wide/base/rI2024, your screen loop (5 trials on wide, DR off) every hour, 8 blocks from 13:49. Clean snapshots → `submissions/` → Jason uploads |
 | Last run | **J17 wv1-end → portal 7.389 / 6.800** (#42, thanks for logging it). J18 (texture fine-tune for the physical race) did not learn carpet/wood in 4 h with the fast 7.130 line (training ~30 % flat); dropped at Jason's request, lap record first |
 | Next | Evaluate Model J15 (~01:30). Then, per Elyas's 7.130 finding: short tracks (reInvent2019_wide, reinvent_base) in every rotation, and textured-floor training on top of the 7.130 model if its checkpoint can be shared (questions below) |
 | Machine notes | Two simulators per run (DRfC multi-config, one track each), 16 GB WSL, C: has ~570 GB free (happy to run long jobs). Repo lives inside WSL: tools now find the repo themselves (`tools/env.sh`) and run from Git Bash or WSL |

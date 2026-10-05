@@ -19,4 +19,4 @@ bash tools/track_rotation.sh model20-jason-m13-twosim m20-jason none best \
 
 ## Results
 
-(pending)
+**Stopped 13:48 after ~65 min** (Jason: run Elyas's 13c plan from the 7.130 model instead of waiting for Model 13 w4-end → J21). From scratch it reached 24–28 % mean progress and its first laps (5.68 s on wide, 6.17 s on base). Snapshot `cedc-m20-jason-stop` (ckpt 74).
