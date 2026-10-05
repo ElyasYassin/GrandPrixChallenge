@@ -6,33 +6,40 @@
 # Training and evaluation can't share the machine (simulator cross-talk), so they alternate.
 # Stops when C: has less than MIN_FREE_GB free or after BLOCKS blocks.
 # usage: bash tools/screen_loop.sh <expdir> <label> <start-prefix> <blocks> [lr]
+#   PAIRS_SPEC="wA:a wB:b;wC:c wD:d"  phase pairs per block (";"-separated, cycled); a world "A+B" trains on two
+#                                simulators at once (one phase of a block then = one two-track leg)
+#   TRAIN_DR=True                domain randomization while training (screening always runs without)
 set -u
 EXP=$1; LABEL=$2; PRE=$3; BLOCKS=$4; LR=${5:-0.0001}
 SNAP_MIN=${SNAP_MIN:-15}; SCREEN_TRACK=${SCREEN_TRACK:-reInvent2019_wide}; KEEP=${KEEP:-2}; MIN_FREE_GB=${MIN_FREE_GB:-3}
-ROOT="$(cd "$(dirname "$0")/.." && pwd)"; cd "$ROOT"
+source "$(dirname "$0")/env.sh"; cd "$ROOT"
 OUT="logs/${LABEL}_screen.txt"
-wsl() { MSYS_NO_PATHCONV=1 wsl.exe -d Ubuntu-22.04 -- "$@" | tr -d '\0\r'; }
-MSYS_NO_PATHCONV=1 wsl.exe -d Ubuntu-22.04 -- bash -c 'exec sleep infinity' > /dev/null 2>&1 &
-KEEPALIVE=$!; trap 'kill $KEEPALIVE 2>/dev/null' EXIT
+wsl() { wsl_exec "$@" | tr -d '\0\r'; }
+start_keepalive; trap 'kill $KEEPALIVE 2>/dev/null' EXIT
+TRAIN_DR=${TRAIN_DR:-False}
+set_dr() { wslrun "sed -i 's/^DR_ENABLE_DOMAIN_RANDOMIZATION=.*/DR_ENABLE_DOMAIN_RANDOMIZATION=$1/' ~/deepracer-for-cloud/run.env"; }
 # phase pairs per block (short tracks most, rI2024 sometimes)
 PAIRS=("reInvent2019_wide:w reinvent_base:b" "2024_reinvent_champ_cw:c reInvent2019_wide:w" "reinvent_base:b Bowtie_track:t")
+[ -n "${PAIRS_SPEC:-}" ] && IFS=";" read -r -a PAIRS <<< "$PAIRS_SPEC"
 for k in $(seq 1 "$BLOCKS"); do
-  free_gb=$(( $(df -BM /c | awk 'NR==2 {gsub("M","",$4); print $4}') / 1024 ))
+  free_gb=$(( $(df -BM "$C_DRIVE" | awk 'NR==2 {gsub("M","",$4); print $4}') / 1024 ))
   if [ "$free_gb" -lt "$MIN_FREE_GB" ]; then echo "== $(date +%T) stopping: only ${free_gb} GB free on C:" >> "$OUT"; break; fi
   pair=${PAIRS[$(( (k - 1) % ${#PAIRS[@]} ))]}
   legs=""; for p in $pair; do legs="$legs ${p%%:*}:${p##*:}$k:30:$LR"; done
   echo "== $(date +%T) block $k from $PRE:$legs" >> "$OUT"
   before=$(grep -c "^snapshot" "logs/${LABEL}_rotation.txt" 2>/dev/null); before=${before:-0}
   rm -f logs/.supervise.pid
+  set_dr "$TRAIN_DR"
   SNAP_MIN=$SNAP_MIN bash tools/track_rotation.sh "$EXP" "$LABEL" "$PRE" last $legs
+  set_dr False   # screen like the portal: no randomization
   snaps=$(grep "^snapshot" "logs/${LABEL}_rotation.txt" | tail -n +$((before + 1)) | awk '{print $2}' | grep -v -- "-end$")   # timed snapshots (the -end one duplicates the last)
   PRE=$(grep "^snapshot" "logs/${LABEL}_rotation.txt" | awk '{print $2}' | grep -- "-end$" | tail -1)
-  wsl bash "/mnt/c/Users/Elyas/OneDrive - The University of Colorado Denver/Desktop/projects/GrandPrixChallenge/tools/wsl/bootstrap.sh" > /dev/null
+  bootstrap > /dev/null
   for s in $snaps; do
     wsl bash /tmp/evalrun.sh "$s" "$SCREEN_TRACK" "scr-${s#cedc-}" | tail -1 | sed "s/^/   $s: /" >> "$OUT"
   done
   # rank: fewest off-tracks, then mean time; package up to KEEP clean ones
-  best=$(python - "$SCREEN_TRACK" $snaps <<'PY'
+  best=$(python3 - "$SCREEN_TRACK" $snaps <<'PY'
 import json, sys
 from pathlib import Path
 rows = []
@@ -57,8 +64,8 @@ PY
     wsl bash /tmp/fetchmodel.sh "$s" > /dev/null 2>&1
     c=$(ls "models/$s/model" | grep -oE "^model_[0-9]+" | grep -oE "[0-9]+" | sort -n | tail -1)
     f="submissions/${s#cedc-}-ckpt$c.tar.gz"
-    python cedc_package_model.py "models/$s/model" "$f" --checkpoint "$c" > /dev/null 2>&1 && \
-      python validate_cedc_bundle.py "$f" 2>&1 | grep -q '"ok": true' && echo "   packaged $f (0 off, mean $mean s, best $bestlap s)" >> "$OUT" && n=$((n + 1))
+    python3 cedc_package_model.py "models/$s/model" "$f" --checkpoint "$c" > /dev/null 2>&1 && \
+      python3 validate_cedc_bundle.py "$f" 2>&1 | grep -q '"ok": true' && echo "   packaged $f (0 off, mean $mean s, best $bestlap s)" >> "$OUT" && n=$((n + 1))
   done <<< "$best"
   [ "$n" -eq 0 ] && echo "   no clean snapshot this block" >> "$OUT"
 done
