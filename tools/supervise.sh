@@ -42,7 +42,7 @@ while true; do
   ensure_tensorboard
   # WSL writes a crash dump (25-335 MB, up to 10 kept) each time Gazebo exits on a simulator
   # restart; they filled ~2 GB of C: per night. Deleting them was approved by the team (2026-10-04).
-  rm -f "$(cygpath -u "$LOCALAPPDATA")/Temp/wsl-crashes/"*.dmp 2>/dev/null
+  [ -n "${LOCALAPPDATA:-}" ] && rm -f "$(cygpath -u "$LOCALAPPDATA")/Temp/wsl-crashes/"*.dmp 2>/dev/null   # Git Bash only
   # WSL's virtual disk lives on C:. When C: filled up (2026-10-02 01:44) Linux got I/O errors and
   # crashed; stop cleanly (checkpoints are safe in MinIO) before that happens.
   free_mib=$(df -BM "$C_DRIVE" | awk 'NR==2 {gsub("M","",$4); print $4}')
