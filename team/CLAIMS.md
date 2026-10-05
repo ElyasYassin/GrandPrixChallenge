@@ -20,3 +20,5 @@ Check here before starting a run. Add a row **before** you start; set Status to 
 | 2026-10-05 | Jason / 3090 | **Model J18 physical race**: J16b ws1-end + carpet/wood floors paired with wide/base (Elyas's settings otherwise, no DR), concrete held out | `cedc-m16b-jason-ws1-end` | **running** 08:35 → ~12:40 | — |
 | — | open | **From-scratch control**: M05 reward, continuous actions, from scratch, to test whether the curriculum helps | scratch | **open** | — |
 | — | open | **Hyperparameters**: discount 0.999 and/or 40 episodes per update | M05 snap2 | **open** | — |
+| 2026-10-05 | Elyas / 3090 | **Model 13b**: Model 13 w4-end (6.333 s lap) + short tracks/rI2024, lr 0.0001, snapshots every 15 min | m13-w4-end | **running** 12:37 → ~16:45 | — |
+| 2026-10-05 | proposed: Jason | **Model 13 with two simulators** from m13-w4-end (bundle from Elyas) | m13-w4-end | **proposed** | — |
