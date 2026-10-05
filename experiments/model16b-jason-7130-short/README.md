@@ -20,4 +20,16 @@ bash tools/track_rotation.sh model16b-jason-7130-short m16b-jason cedc-m10v-c2-e
 
 ## Results
 
-(pending)
+Trained 22:30 → 03:17 (7 legs × 40 min). Training on reInvent2019_wide rose 39 → 74 % mean progress (3 → 25 laps / 60 episodes, ~6.4-7.0 s laps); rI2024 / Vegas / Bowtie stayed hard (20-30 %), as in Elyas's runs.
+
+Evaluation (DR off, 3 trials, non-continuous, 1 s penalties, same settings for all; `logs/m16b_eval.txt`, `evals/m16b-*`):
+
+| Model | Laps | Off-tracks | Mean | reInvent2019_wide | reinvent_base | rI2024 CW | Vegas |
+|---|---|---|---|---|---|---|---|
+| 7.130 model (`cedc-m10v-c2-end`) | 12/12 | 24 | 11.19 s | 8.39 s / 3 off | 11.07 / 8 | 13.58 / 7 | 11.73 / 6 |
+| **ws1-end** (ckpt 332) | 12/12 | **10** | **10.01 s** | 7.65 / **0** | **8.89** / 3 | 13.02 / 5 | 10.46 / 2 |
+| wbo1-end (ckpt 287) | 12/12 | 16 | 10.68 s | **6.80** / **0** | 9.55 / 5 | 12.73 / 4 | 13.64 / 7 |
+| bw2-end (final) | 12/12 | 16 | 10.75 s | 9.12 / 3 | 9.79 / 6 | 13.59 / 6 | 10.51 / 1 |
+| ws1-0225 | 12/12 | 18 | 11.06 s | 7.92 / 2 | 10.24 / 4 | 14.54 / 9 | 11.52 / 3 |
+
+`ws1-end`: less than half the off-tracks and ~1.2 s faster per lap than the 7.130 model. Packaged + validated: `submissions/cedc-m16b-jason-ws1-end.tar.gz`, `submissions/cedc-m16b-jason-wbo1-end.tar.gz` (portal upload: Jason's decision). Ghost race on reinvent_base: `videos/base_7130_vs_j16b.mp4`.

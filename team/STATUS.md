@@ -11,7 +11,7 @@ Edit only your own section. Times are local (Mountain Time).
 | | |
 |---|---|
 | Training now | Nothing (C: drive ~2.8 GB free) |
-| Last run | Model 07 (off-track penalty + edge safety): no clear gain over M05 snap2 in 5 trials × 6 tracks |
+| Last run | **J16b** (your 7.130 model + your settings, two simulators, 4.8 h): `ws1-end` 12/12 laps, **10 off-tracks vs 24** for the 7.130 model, **10.01 vs 11.19 s** mean on wide / base / rI2024 / Vegas (same eval settings). Packaged for portal: `submissions/cedc-m16b-jason-ws1-end.tar.gz`, `…-wbo1-end.tar.gz` |
 | Best on portal | **Model 10 variety c2-end (ckpt 199): 7.130**, best lap 6.740 (#33). Leaderboard keeps the best submission |
 | Next | Evaluate M08 snapshots on held-out tracks (reInvent2019, reinvent_base, 2022_reinvent_champ_ccw); check zig-zag numbers |
 | Machine notes | 1 simulator only (CPU); simulator leaks memory with GPU rendering → `tools/supervise.sh` restarts it at iteration boundaries |
@@ -20,12 +20,12 @@ Edit only your own section. Times are local (Mountain Time).
 
 ## Jason: RTX 3090 (DRfC in WSL2, repo inside WSL at ~/GrandPrixChallenge)
 
-**Updated:** 2026-10-04 22:35
+**Updated:** 2026-10-05 04:00
 
 | | |
 |---|---|
-| Training now | **Model J16b**: your 7.130 model with your settings (M10 reward, no DR, plain floors, short tracks wide/base + rI2024/Vegas/Bowtie/Summit, lr 0.0001), two tracks at once, 22:30 → ~03:20. (Texture fine-tune for the physical race postponed; the 7.130 model leaves carpet 4-5×/lap.) |
-| Last run | Model 14b (smooth/completion-first reward): all evals 100 % but not better than **Model 13 wooc1-end**, which stays our best (0 off on 6 tracks, 12.53 s; `submissions/cedc-m13-jason-wooc1-end.tar.gz`) |
+| Training now | **Model J17**: J16b ws1-end + your recipe again (short tracks weighted more), two simulators, 04:00 → ~08:00 |
+| Last run | **J16b** (your 7.130 model + your settings, two simulators, 4.8 h): `ws1-end` 12/12 laps, **10 off-tracks vs 24** for the 7.130 model, **10.01 vs 11.19 s** mean on wide / base / rI2024 / Vegas (same eval settings). Packaged for portal: `submissions/cedc-m16b-jason-ws1-end.tar.gz`, `…-wbo1-end.tar.gz` |
 | Next | Evaluate Model J15 (~01:30). Then, per Elyas's 7.130 finding: short tracks (reInvent2019_wide, reinvent_base) in every rotation, and textured-floor training on top of the 7.130 model if its checkpoint can be shared (questions below) |
 | Machine notes | Two simulators per run (DRfC multi-config, one track each), 16 GB WSL, C: has ~570 GB free (happy to run long jobs). Repo lives inside WSL: tools now find the repo themselves (`tools/env.sh`) and run from Git Bash or WSL |
 
