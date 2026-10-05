@@ -20,11 +20,11 @@ Edit only your own section. Times are local (Mountain Time).
 
 ## Jason: RTX 3090 (DRfC in WSL2, repo inside WSL at ~/GrandPrixChallenge)
 
-**Updated:** 2026-10-04 22:00
+**Updated:** 2026-10-04 22:35
 
 | | |
 |---|---|
-| Training now | **Model J16**: Elyas's 7.130 model (thanks for the bundles!) + textured floors carpet/wood, paired with reInvent2019_wide / reinvent_base / rI2024 / Vegas, DR on, 2 simulators, lr 0.0001, 21:52 → ~02:40 |
+| Training now | **Model J16b**: your 7.130 model with your settings (M10 reward, no DR, plain floors, short tracks wide/base + rI2024/Vegas/Bowtie/Summit, lr 0.0001), two tracks at once, 22:30 → ~03:20. (Texture fine-tune for the physical race postponed; the 7.130 model leaves carpet 4-5×/lap.) |
 | Last run | Model 14b (smooth/completion-first reward): all evals 100 % but not better than **Model 13 wooc1-end**, which stays our best (0 off on 6 tracks, 12.53 s; `submissions/cedc-m13-jason-wooc1-end.tar.gz`) |
 | Next | Evaluate Model J15 (~01:30). Then, per Elyas's 7.130 finding: short tracks (reInvent2019_wide, reinvent_base) in every rotation, and textured-floor training on top of the 7.130 model if its checkpoint can be shared (questions below) |
 | Machine notes | Two simulators per run (DRfC multi-config, one track each), 16 GB WSL, C: has ~570 GB free (happy to run long jobs). Repo lives inside WSL: tools now find the repo themselves (`tools/env.sh`) and run from Git Bash or WSL |

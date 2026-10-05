@@ -24,4 +24,4 @@ bash tools/track_rotation.sh model16-jason-7130-texture m16-jason cedc-m10v-c2-e
 
 ## Results
 
-(pending)
+**Dropped after ~10 min (22:30)**: Jason prefers the portal focus with Elyas's own settings first → J16b. The texture version stays the plan for the physical race. Check of the 7.130 model on carpet (DR off): 3/3 laps but 5/4/4 off-tracks per lap (J13: 0), so the texture risk is real for this model too. First start (21:52) failed with "No checkpoint to restore" (import bug, fixed in `tools/wsl/import_bundle.sh`).
