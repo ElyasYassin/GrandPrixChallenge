@@ -23,3 +23,5 @@ Check here before starting a run. Add a row **before** you start; set Status to 
 | 2026-10-05 | Elyas / 3090 | **Model 13b**: Model 13 w4-end (6.333 s lap) + short tracks/rI2024, lr 0.0001, snapshots every 15 min | m13-w4-end | **running** 12:37 → ~16:45 | — |
 | 2026-10-05 | proposed: Jason | **Model 13 with two simulators** from m13-w4-end (bundle from Elyas) | m13-w4-end | **proposed** | — |
 | 2026-10-05 | Jason / 3090 | **Model J20 = Elyas's Model 13 recipe on two simulators** (from scratch, M13 reward + actions, no DR, short tracks + rI2024 + Bowtie). J19 (7.130 line, short tracks) stopped after 1 leg | scratch | **running** 12:43 → ~19:20 | — |
+| 2026-10-05 | Elyas / 3090 | **Model 13b**: Model 13 w4-end (6.333 s lap) + short tracks/rI2024, lr 0.0001, snapshots every 15 min | m13-w4-end | **dropped** 12:46 (replaced by Model 13c screening loop) | — |
+| 2026-10-05 | Elyas / 3090 | **Model 13c screening loop** (R2 speed-scaled off-track penalty + R3 screening), hourly blocks | m13-w4-end | **running** 12:47 → (disk-limited) | `logs/m13c_screen.txt` |

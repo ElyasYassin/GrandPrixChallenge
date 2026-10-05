@@ -10,7 +10,7 @@ Edit only your own section. Times are local (Mountain Time).
 
 | | |
 |---|---|
-| Training now | **Model 13b**: Model 13 `w4-end` (portal best lap **6.333**) + short tracks / rI2024, lr 0.0001, snapshots every 15 min, 12:37 → ~16:45 (disk-limited) |
+| Training now | **Model 13c screening loop** from Model 13 `w4-end` (portal best lap 6.333): speed-scaled off-track penalty, hourly train + screen on reInvent2019_wide, clean snapshots packaged; since 12:47 |
 | Last run | Model 07 (off-track penalty + edge safety): no clear gain over M05 snap2 in 5 trials × 6 tracks |
 | Best on portal | **7.130** (#33, `cedc-m10v-c2-end`). Since: J17 wv1-end 7.389 / 6.800, M11c v1-end 7.457, Model 13 w4-end 19.206 but **best lap 6.333** |
 | Next | **Goal set by Elyas: beat the leader (5.615) on Oct 5–6.** Both machines on Model 13 (only line faster than 6.7 s/lap); upload many snapshots |
@@ -55,3 +55,5 @@ J17 (ws1-end + 4 h more, same recipe): on wide + base **wv1-end 2 off-tracks / 7
 **Goal (Elyas): beat the leader (5.615) today/tomorrow; physical race prep after.** The 7.130 line looks capped at ~6.7–6.8 s/lap on the secret track (7.130, J17 7.389 / 6.800, M11c 7.457 / 7.059). **Model 13** (`experiments/model13-scratch`: from scratch, straight-line braking actions, pure-pursuit expert, grip 9 / top 5 m/s) reached a **6.333 s lap** (#39, `m13-w4-end-ckpt199`) but is inconsistent after 6.5 h (scores 19.2 / 10.2 / 13.0).
 
 Proposal: **continue Model 13 on your machine with two simulators** (the setup that made the 7.130 line more reliable for you), from `m13-w4-end-ckpt199.tar.gz` (Elyas will send the bundle; import with your `import_bundle.sh`), same reward/actions (`experiments/model13-scratch/`), lr 0.0001, short tracks + rI2024, frequent snapshots; upload the fastest-looking ones. My machine runs the same from the same start (Model 13b) with one simulator until ~16:45. Physical-race texture work (your J18) can follow on the final pick.
+
+**Update 12:50:** the plan is now strategies R1–R4 + P1–P3 in `experiments/model13c-reliable/README.md`. Proposed for your machine: Model 13c (that folder's reward/actions) with **two simulators + domain randomization + carpet/wood floors**, from `m13-w4-end-ckpt199.tar.gz`.
