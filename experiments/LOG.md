@@ -40,6 +40,8 @@ One row per trained model. Change **one idea** per model.
 | 35 | 2026-10-04 17:42 | Model 11c w1-end ckpt 235 (7.130 lineage + M11/11b/11c reward changes, 1 phase of 11c) | 100% | 10.039 | 6.919 |
 | 36 | 2026-10-04 23:55 | Model 11c v1-end ckpt 292 (after Vegas phase) | 100% | 7.457 | 7.059 |
 | 37 | 2026-10-04 23:55 | Model 11c r1-end ckpt 285 (after carpet phase) | 100% | 11.224 | 7.256 |
+| 39 | 2026-10-05 11:45 | Model 13 w4-end ckpt 199 (from scratch, ~6.5 h) | 100% | 19.206 | **6.333** |
+| 40 | 2026-10-05 11:47 | Model 13 b4-end ckpt 211 | 100% | 10.157 | 10.100 |
 
 Leader (2026-09-30): Shallow Learner, 100%, 5.615 / 5.542.
 | 09 | cedc-m09-<leg> (track rotation) | **speed push**: distance reward (15 × % of lap per step), lap bonus ∝ speed², off-track −5; from M08 vegas2-2147; stand-in tracks only | 02:11 → 07:21 (**all on 2024_reinvent_champ_cw**: the track switches failed, see FINDINGS) | laps 20% → ~70%; lap 15.5–15.9 s (M08 2nd round there: 16.0–16.5 s) | not evaluated yet | 14.4 (training) | **10.167** (#21, summit1-0414 ckpt 87, best lap 9.985); 11.286 (#20, champ2-0515 ckpt 94) | stopped M08's slow drift and much more reliable, but not faster than M08's first round on this track |
