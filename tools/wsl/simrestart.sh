@@ -2,7 +2,8 @@
 # the run continues. A restarted simulator starts a fresh TrainingMetrics file, so first save the
 # current ones as part<N>_TrainingMetrics*.json next to the run's logs (tools/tb_export.py stitches them).
 PREFIX=$(grep "^DR_LOCAL_S3_MODEL_PREFIX=" ~/deepracer-for-cloud/run.env | cut -d= -f2)
-OUT="/mnt/c/Users/Elyas/OneDrive - The University of Colorado Denver/Desktop/projects/GrandPrixChallenge/logs/$PREFIX"
+ROOT=$(cat /tmp/gpc_root 2>/dev/null) || ROOT=$(cd "$(dirname "$0")/../.." && pwd)   # project root (set by bootstrap.sh)
+OUT="$ROOT/logs/$PREFIX"
 mkdir -p "$OUT"
 A="aws --profile minio --endpoint-url http://localhost:9000"
 n=$(ls "$OUT" | grep -c "^part.*_TrainingMetrics.json$"); n=$((n + 1))

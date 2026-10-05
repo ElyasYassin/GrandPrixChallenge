@@ -1,0 +1,364 @@
+# Model 15 (jason): better path following -> lap time. Model 13/14b evals: the car drives closer to the
+# centre line than to the racing line (mean 0.13-0.16 m from centre, 0.19-0.21 m from the line on 1.07 m
+# tracks; only 26-30 % of steps within 0.10 m of the line), averages ~1.9 m/s and never picks the 4 m/s
+# actions on straights. Its expert aimed at a point ~1 m ahead and steered by the bearing to it, which
+# twitches around the line (the policy copies that, and the +-12 deg actions only go 1.7-2.1 m/s).
+# Change vs Model 14b: the expert is a Stanley-type path tracker on the racing line (feed-forward from the
+# line's curvature + heading error + gentle pull-back on the lateral offset, measured wheelbase 0.34 m).
+# Closed-loop check (tools/expert_closed_loop.py, measured geometry, 8 deg steering noise, 5 tracks):
+# lap total 40.8 -> 36.9 s, off-tracks 3.0 -> 1.0, full lock 15 -> 7 %, mean speed 2.96 -> 3.10 m/s.
+#
+# Model 14b (jason): Model 14 reward with Model 12a/13 action speeds (fallback if the faster actions
+# cost too much completion). Everything below is Model 14 except MIN_SPEED.
+#
+# Model 14 (jason): smooth, fast, completion first. Fine-tunes a model that already drives (Model 12a/13).
+# Priorities, in order: finish the lap, then lap time; drive the racing line without weaving.
+# Model 12a weaves on straights (evals: 54-94% of straight steps at >= 12 deg, ~3 left/right flips per
+# second) because its expert does (replayed eval states: 18-20 deg asked on straights, 2-3 flips/s).
+# A longer expert lookahead on straights was tried and dropped: the expert then cut corners and left the
+# track on 4 more test tracks (tools/test_reward.py). Changes vs Model 12a:
+#  1. Speed: Model 10's faster actions (same 15 actions, same order; slowest 2.0 m/s, top 4.0 m/s = the
+#     physical car's limit) and Model 10's expert floor MIN_SPEED 2.0.
+#  2. Racing line: besides imitating the expert (which follows the racing line), up to LINE_WEIGHT for
+#     being on the line itself (full within LINE_FULL_M, nothing beyond LINE_ZERO_M).
+#  3. Smooth: SMOOTH_WEIGHT 0.5 -> 1.0, a left/right steering flip earns no smoothness, and a straight
+#     bonus (up to STRAIGHT_WEIGHT for steering < ~12 deg while the track ahead is straight and the car
+#     points along it).
+#  5. Multi-scale racing line: the single-scale curvature passes left a sawtooth on straights (Vegas,
+#     Summit, rI2024, reInvent2019 plots) that made the expert weave, and followed S-bends too closely.
+#     Coarse-to-fine passes straighten S-bends through the middle and remove the sawtooth: ideal lap
+#     (tools/lap_time_sim.py model, 4 m/s, 7 m/s^2) over 5 tracks 34.02 -> 33.49 s, line wobbles about halved.
+#  4. Completion first: a lap pays a fixed COMPLETION_BONUS plus the speed bonus (was speed bonus only),
+#     so a slow finished lap still beats a fast crash.
+#
+# Model 12a (jason): slow start for a from-scratch model. Model 10 reward and car physics, but Model 09's
+# action speeds (same 15 actions, same order), so a beginner survives long enough to learn. Phase B
+# (model12-jason-multi) then switches to Model 10's speeds.
+#
+import math
+
+# Model 10: the real car. A grip test (tools/grip_sweep.sh: fixed steering + speed circles) showed the
+# simulated car turns about twice as wide as our expert assumed (radius ~0.34 m / tan(steer), not
+# 0.165 m / tan(steer)) and holds at least 8 m/s^2 sideways without sliding (we assumed 5). The expert
+# therefore capped corner speed far too low (~1.2 m/s at full lock; the car holds 2.0-2.4).
+# Changes vs Model 09: effective wheelbase 0.34 m, grip budget 7 m/s^2, and faster speeds on the same
+# 15 steering actions (same order, so it fine-tunes from Model 09).
+#
+# Model 09: speed push (fine-tuned from Model 08 vegas2-2147, portal 10.824 with only 0.6 s lost to
+# off-tracks: speed is now the limit). Model 08 got slower overnight because every step on track
+# earned ~4 reward, so a slow lap collected more in total than a fast one. Changes vs Model 08:
+#  1. Distance reward: PROGRESS_WEIGHT per % of lap covered in this step (replaces the small
+#     average-pace term). Per step it is proportional to speed, so within the discount horizon
+#     covering more track pays more; a whole lap is worth the same however long it takes.
+#  2. Lap bonus grows with the square of the lap's average speed (was linear and small).
+#  3. Off-track penalty -5 (Model 07/08: -20), so the car is less timid near the limit.
+#
+# Model 07: reliable. Model 06 had our fastest portal best lap (14.51 s) but lost ~9 s to off-tracks
+# (score 23.554). Changes vs Model 06: a large penalty when the car leaves the track (instead of ~0)
+# and an edge-safety factor that scales the reward down as the wheels approach an edge.
+#
+# Model 06: faster. Model 05 (our best, portal 17.877) hit the same best lap as Model 04 on the
+# secret track (14.71 s), so top speed looks like the limit. Changes vs Model 05: speed range
+# 1.3-4.0 m/s (was 1.3-3.0), expert grip budget 5 m/s^2 (was 4; we measured >= 5-6 in the
+# simulator), pace reward capped at ~4 m/s (was ~3). Trained with learning rate 0.0001.
+#
+# Model 05: racing line + smooth steering. Model 04's expert (speed profile + grip limit,
+# both directions, 1.3-3.0 m/s, speed-scaled lap bonus), plus two racing-driver principles:
+#  1. Racing line: instead of the centre line, the expert follows a minimum-curvature line
+#     (outside -> apex -> outside), computed from the current track's waypoints and cached.
+#     Wider curves allow more speed at the same grip.
+#  2. Smooth hands: a small bonus for small steering changes between steps.
+# Everything is derived from params at runtime, so it works on any track (no hard-coded positions).
+
+MIN_SPEED, MAX_SPEED = 1.3, 4.0   # Model 14b: Model 12a/13 speeds (slowest 1.3 m/s); Model 14: 2.0
+MAX_STEER = 30.0
+STEER_TOLERANCE_DEG = 10.0
+MAX_LAT_ACC = 7.0                 # m/s^2 the expert allows in a turn (grip test: >= 8.4 without sliding; Model 05-09: 5.0)
+MAX_BRAKE = 3.0                   # m/s^2 the expert assumes it can slow down at
+PLAN_AHEAD_M = 4.0                # how far ahead the speed profile looks
+FF_AHEAD_M = 0.3                  # feed-forward curvature taken this far ahead on the line
+STANLEY_GAIN = 1.5                # 1/s: pull-back gain on the lateral offset
+STEER_SPEED_CAP = True            # also cap speed by the commanded steering angle: 3x fewer off-tracks in the closed-loop sweep
+STANLEY_SOFT = 0.5                # m/s added to the speed in the pull-back term (gentle at low speed)
+WHEELBASE = 0.34                  # m, effective: measured turn radius ~0.34 / tan(steer) (nominal 0.165)
+
+LINE_MARGIN_M = 0.30              # racing line stays this far inside each edge (0.22 went off 6 of 10 test tracks)
+LINE_SCALES = ((16, 300), (8, 300), (4, 300), (2, 300), (1, 300))   # (neighbour distance, passes), coarse to fine
+LINE_SMOOTH_PASSES = 2
+SMOOTH_STEER_DEG = 15.0           # steering change per step that earns no smoothness bonus
+SMOOTH_WEIGHT = 1.0               # Model 12a: 0.5
+STRAIGHT_TURN_DEG = 30.0          # line turning this much within STRAIGHT_CHECK_M ahead counts as a corner
+STRAIGHT_CHECK_M = 2.0
+STRAIGHT_WEIGHT = 1.0
+STRAIGHT_HEADING_DEG = 15.0       # car heading vs track direction for the straight bonus
+OFFTRACK_PENALTY = -5.0           # reward on the step the car leaves the track (Model 07/08: -20)
+PROGRESS_WEIGHT = 15.0            # reward per % of the lap covered in one step (~0.3 %/step at 1.5 m/s on 25 m)
+LAP_BONUS = 200.0                 # times (average lap speed / 2 m/s)^2 (Model 12a: 300)
+COMPLETION_BONUS = 400.0          # for finishing at all (Model 12a: none)
+LINE_WEIGHT = 1.0
+LINE_FULL_M, LINE_ZERO_M = 0.10, 0.40
+SAFE_EDGE_M = 0.25                # full reward while the car centre is >= this far from an edge
+MIN_EDGE_M = 0.10                 # car half-width: at this distance a wheel touches the edge
+
+_line_cache = {}                  # track signature -> racing line points
+_last = {"steps": None, "steer": None}
+_prog = {"steps": None, "progress": 0.0}
+
+
+def _turn_ahead_deg(path, start_idx, distance):
+    """Net heading change (deg, absolute) of the path over `distance` metres from point start_idx:
+    direction of the first segment vs the segment `distance` metres on (zero-length segments skipped)."""
+    n = len(path)
+    first, travelled, i = None, 0.0, start_idx
+    for _ in range(n):
+        a, b = path[i % n], path[(i + 1) % n]
+        i += 1
+        d = _dist(a, b)
+        if d < 1e-6:
+            continue
+        h = math.degrees(math.atan2(b[1] - a[1], b[0] - a[0]))
+        if first is None:
+            first = h
+        travelled += d
+        if travelled >= distance:
+            return abs(_angle_diff(h, first))
+    return 0.0
+
+
+def _lookahead_m(speed):
+    return 0.45 + 0.15 * speed     # pure-pursuit target: 0.6 m at 1 m/s, 0.83 m at 2.5 m/s
+
+
+def _dist(a, b):
+    return math.hypot(b[0] - a[0], b[1] - a[1])
+
+
+def _angle_diff(a, b):
+    """Smallest signed difference a - b in degrees, in [-180, 180)."""
+    return (a - b + 180.0) % 360.0 - 180.0
+
+
+def _signed_curvature(a, b, c):
+    """Signed curvature (1/m) of the circle through a, b, c: positive = turning left."""
+    ab, bc, ca = _dist(a, b), _dist(b, c), _dist(c, a)
+    if ab * bc * ca < 1e-12:
+        return 0.0
+    cross = (b[0] - a[0]) * (c[1] - b[1]) - (b[1] - a[1]) * (c[0] - b[0])
+    return 2.0 * cross / (ab * bc * ca)
+
+
+def racing_line(waypoints, track_width):
+    """Racing line in the spirit of the K1999 algorithm: repeatedly move each point sideways so
+    its curvature becomes the average of its neighbours' curvatures. That spreads every turn over
+    a longer arc (outside -> apex -> outside) without shrinking the whole loop, then each point is
+    clamped to stay LINE_MARGIN_M inside the edges. Point i stays paired with centre-line waypoint
+    i (it only moves along i's normal), so closest_waypoints indexes both."""
+    # drop a duplicated closing point, if any
+    pts_in = [(float(p[0]), float(p[1])) for p in waypoints]
+    n = len(pts_in)
+    key = (n, round(pts_in[0][0], 3), round(pts_in[0][1], 3),
+           round(pts_in[1][0], 3), round(pts_in[1][1], 3), round(track_width, 3))
+    if key in _line_cache:
+        return _line_cache[key]
+    center = pts_in
+    normals = []  # unit LEFT normal at each centre-line point
+    for i in range(n):
+        a, b = center[(i - 1) % n], center[(i + 1) % n]
+        dx, dy = b[0] - a[0], b[1] - a[1]
+        L = math.hypot(dx, dy) or 1.0
+        normals.append((-dy / L, dx / L))
+    max_off = max(0.0, track_width / 2.0 - LINE_MARGIN_M)
+    off = [0.0] * n  # signed lateral offset along the left normal
+    # multi-scale: shape the long sweeps first (neighbours 16 points away), then refine down to single
+    # points. Coarse passes straighten S-bends through the middle and avoid the sawtooth the old
+    # single-scale passes left on straights
+    for k, iterations in LINE_SCALES:
+        for _ in range(iterations):
+            pts = [(center[i][0] + off[i] * normals[i][0], center[i][1] + off[i] * normals[i][1]) for i in range(n)]
+            kv = [_signed_curvature(pts[(i - k) % n], pts[i], pts[(i + k) % n]) for i in range(n)]
+            for i in range(n):
+                target = 0.5 * (kv[(i - k) % n] + kv[(i + k) % n])
+                chord = _dist(pts[(i - k) % n], pts[(i + k) % n])
+                # moving a point by delta toward its left changes its curvature by about -8*delta/chord^2
+                delta = (kv[i] - target) * chord * chord / 8.0
+                off[i] = max(-max_off, min(max_off, off[i] + 0.5 * delta))
+    for _ in range(LINE_SMOOTH_PASSES):  # light final smoothing of leftover point-to-point noise
+        off = [max(-max_off, min(max_off, (off[(i - 1) % n] + off[i] + off[(i + 1) % n]) / 3.0)) for i in range(n)]
+    line = [(center[i][0] + off[i] * normals[i][0], center[i][1] + off[i] * normals[i][1]) for i in range(n)]
+    _line_cache[key] = line
+    return line
+
+
+def _seg_dist(p, a, b):
+    """Distance from point p to segment a-b."""
+    abx, aby = b[0] - a[0], b[1] - a[1]
+    L2 = abx * abx + aby * aby
+    t = 0.0 if L2 < 1e-12 else max(0.0, min(1.0, ((p[0] - a[0]) * abx + (p[1] - a[1]) * aby) / L2))
+    return math.hypot(p[0] - a[0] - t * abx, p[1] - a[1] - t * aby)
+
+
+def _point_ahead(path, start_idx, start_pos, distance):
+    """Walk along the path from start_pos until `distance` metres are covered."""
+    n = len(path)
+    pos, idx, left = start_pos, start_idx, distance
+    for _ in range(n):
+        nxt = path[idx % n]
+        d = _dist(pos, nxt)
+        if d >= left:
+            t = left / d if d > 0 else 0.0
+            return (pos[0] + t * (nxt[0] - pos[0]), pos[1] + t * (nxt[1] - pos[1]))
+        left -= d
+        pos, idx = nxt, idx + 1
+    return path[start_idx % n]
+
+
+def _radius(a, b, c):
+    """Radius (m) of the circle through three points; inf on a straight."""
+    ab, bc, ca = _dist(a, b), _dist(b, c), _dist(c, a)
+    cross = abs((b[0] - a[0]) * (c[1] - b[1]) - (b[1] - a[1]) * (c[0] - b[0]))
+    return float("inf") if cross < 1e-9 else ab * bc * ca / (2.0 * cross)
+
+
+def _speed_limit_ahead(path, start_idx, car):
+    """Fastest speed now that still lets the car slow down for every curve of the path within
+    PLAN_AHEAD_M: a point at distance d with radius R allows v_corner = sqrt(MAX_LAT_ACC * R),
+    so the car may be going at most sqrt(v_corner^2 + 2 * MAX_BRAKE * d) now."""
+    n = len(path)
+    limit, travelled, prev, i = MAX_SPEED, 0.0, car, start_idx
+    for _ in range(n):
+        p = path[i % n]
+        travelled += _dist(prev, p)
+        if travelled > PLAN_AHEAD_M:
+            break
+        r = _radius(path[(i - 2) % n], p, path[(i + 2) % n])
+        if r != float("inf"):
+            v_corner = math.sqrt(MAX_LAT_ACC * r)
+            limit = min(limit, math.sqrt(v_corner ** 2 + 2.0 * MAX_BRAKE * travelled))
+        prev, i = p, i + 1
+    return limit
+
+
+def _line_pose(line, next_idx, car):
+    """Closest point on the racing line near next_idx: (segment index, point, line heading deg,
+    signed lateral offset of the car in m, positive = car left of the line)."""
+    n = len(line)
+    best = None
+    for k in range(-4, 5):
+        i = (next_idx + k) % n
+        a, b = line[i], line[(i + 1) % n]
+        abx, aby = b[0] - a[0], b[1] - a[1]
+        L2 = abx * abx + aby * aby
+        if L2 < 1e-12:
+            continue
+        t = max(0.0, min(1.0, ((car[0] - a[0]) * abx + (car[1] - a[1]) * aby) / L2))
+        px, py = a[0] + t * abx, a[1] + t * aby
+        d = math.hypot(car[0] - px, car[1] - py)
+        if best is None or d < best[0]:
+            cross = abx * (car[1] - a[1]) - aby * (car[0] - a[0])
+            best = (d, i, (px, py), math.degrees(math.atan2(aby, abx)), d if cross > 0 else -d)
+    if best is None:
+        return next_idx, line[next_idx], 0.0, 0.0
+    return best[1], best[2], best[3], best[4]
+
+
+def expert_action(params):
+    """Return (steering_deg, speed_mps) the expert would choose in this state.
+    Model 15: a Stanley-type path tracker on the racing line instead of aiming at a point ~1 m ahead.
+    steering = feed-forward from the line's curvature just ahead (atan(wheelbase * curvature))
+             + the car's heading error to the line + a gentle pull back onto the line
+    (atan(STANLEY_GAIN * lateral offset / speed)). It holds the line through bends and
+    corrects offsets without overshooting, so its commands stay smooth (no weaving to copy)."""
+    line = racing_line(params["waypoints"], params["track_width"])
+    car = (params["x"], params["y"])
+    next_idx = params["closest_waypoints"][1]
+    speed_now = max(MIN_SPEED, params["speed"])
+    n = len(line)
+
+    seg, foot, line_heading, offset = _line_pose(line, next_idx, car)
+    # curvature of the line a little ahead (the car reacts one step late)
+    ahead = _point_ahead(line, (seg + 1) % n, foot, FF_AHEAD_M)
+    j = min(range(n), key=lambda i: _dist(line[i], ahead))
+    kappa = _signed_curvature(line[(j - 2) % n], line[j], line[(j + 2) % n])
+    feed_forward = math.degrees(math.atan(WHEELBASE * kappa))
+    heading_err = _angle_diff(line_heading, params["heading"])
+    pull = -math.degrees(math.atan(STANLEY_GAIN * offset / (speed_now + STANLEY_SOFT)))
+    steer = max(-MAX_STEER, min(MAX_STEER, feed_forward + heading_err + pull))
+
+    # speed profile on the racing line's curves (not capped by the corrective steering any more:
+    # the line's own curvature already sets the corner speed)
+    speed = _speed_limit_ahead(line, next_idx, car)
+    if STEER_SPEED_CAP:  # grip limit for the commanded steering: v^2 * tan(steer) / wheelbase <= MAX_LAT_ACC
+        tan_s = math.tan(math.radians(abs(steer)))
+        if tan_s > 1e-3:
+            speed = min(speed, math.sqrt(MAX_LAT_ACC * WHEELBASE / tan_s))
+    return steer, max(MIN_SPEED, speed)
+
+
+def _smoothness(params):
+    """1.0 for no steering change since the previous step, 0 at SMOOTH_STEER_DEG or more.
+    Remembers the previous step's steering (reset when a new episode starts)."""
+    steps, steer = params["steps"], params["steering_angle"]
+    prev_steps, prev_steer = _last["steps"], _last["steer"]
+    _last["steps"], _last["steer"] = steps, steer
+    if prev_steps is None or steps != prev_steps + 1:   # first step of an episode (or a gap)
+        return 0.0
+    if steer * prev_steer < 0:   # left <-> right flip
+        return 0.0
+    return max(0.0, 1.0 - abs(steer - prev_steer) / SMOOTH_STEER_DEG)
+
+
+def _progress_delta(params):
+    """% of the lap covered since the previous step (0 on an episode's first step or after a gap)."""
+    steps, progress = params["steps"], params["progress"]
+    prev_steps, prev_progress = _prog["steps"], _prog["progress"]
+    _prog["steps"], _prog["progress"] = steps, progress
+    if prev_steps is None or steps != prev_steps + 1:
+        return 0.0
+    return max(0.0, min(2.0, progress - prev_progress))   # clip: resets/glitches never pay
+
+
+def reward_function(params):
+    smooth = _smoothness(params)  # update the steering memory on every step, even off track
+    # note: params["is_reversed"] means "driving the track clockwise", not "wrong way", so don't use it here
+    if params["is_offtrack"]:
+        return OFFTRACK_PENALTY
+    if not params["all_wheels_on_track"]:
+        return 1e-3
+
+    expert_steer, expert_speed = expert_action(params)
+
+    steer_error = abs(params["steering_angle"] - expert_steer)
+    steer_score = math.exp(-(steer_error / STEER_TOLERANCE_DEG) ** 2)
+
+    speed_error = abs(params["speed"] - expert_speed)
+    speed_score = max(0.0, 1.0 - speed_error / (MAX_SPEED - MIN_SPEED))
+
+    reward = 1.0 + 2.0 * steer_score + 1.0 * speed_score + SMOOTH_WEIGHT * smooth
+
+    # racing line: distance from the car to the line near the next waypoint
+    line = racing_line(params["waypoints"], params["track_width"])
+    car = (params["x"], params["y"])
+    n = len(line)
+    d_line = min(_seg_dist(car, line[(params["closest_waypoints"][1] + k - 1) % n], line[(params["closest_waypoints"][1] + k) % n]) for k in range(3))
+    reward += LINE_WEIGHT * max(0.0, min(1.0, (LINE_ZERO_M - d_line) / (LINE_ZERO_M - LINE_FULL_M)))
+
+    # straight bonus: hold the wheel still while the track ahead is straight and the car points along it
+    wps, (prev_i, next_i) = params["waypoints"], params["closest_waypoints"]
+    track_dir = math.degrees(math.atan2(wps[next_i][1] - wps[prev_i][1], wps[next_i][0] - wps[prev_i][0]))
+    straight = max(0.0, 1.0 - _turn_ahead_deg(wps, next_i, STRAIGHT_CHECK_M) / STRAIGHT_TURN_DEG)
+    if abs(_angle_diff(params["heading"], track_dir)) < STRAIGHT_HEADING_DEG:
+        reward += STRAIGHT_WEIGHT * straight * max(0.0, 1.0 - abs(params["steering_angle"]) / 12.0)
+
+    # edge safety: scale the reward down as the car gets close to an edge (1 at >= SAFE_EDGE_M, 0 at MIN_EDGE_M)
+    edge = params["track_width"] / 2.0 - params["distance_from_center"]
+    reward *= max(0.0, min(1.0, (edge - MIN_EDGE_M) / (SAFE_EDGE_M - MIN_EDGE_M)))
+
+    # distance covered this step (progress is % of the lap since the episode started)
+    reward += PROGRESS_WEIGHT * _progress_delta(params)
+
+    if params["progress"] >= 100:
+        # finishing pays 400 at any pace; faster laps pay more on top: 600 at 2 m/s (15 steps/s), 850 at 3 m/s
+        avg_speed = params["track_length"] * 15.0 / max(params["steps"], 1)
+        reward += COMPLETION_BONUS + LAP_BONUS * (avg_speed / 2.0) ** 2
+
+    return float(reward)

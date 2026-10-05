@@ -6,8 +6,8 @@
 # usage: bash tools/overnight_run.sh <run-base> <label> <STOP_AT HH:MM> <supervisor-output-file> [SNAP_MIN]
 set -u
 BASE=$1; LABEL=$2; STOP_AT=$3; SUP_OUT=$4; SNAP_MIN=${5:-30}
-ROOT="$(cd "$(dirname "$0")/.." && pwd)"; cd "$ROOT"
-wslrun() { MSYS_NO_PATHCONV=1 timeout 300 wsl.exe -d Ubuntu-22.04 -- bash -c "$1" | tr -d '\0\r'; }
+source "$(dirname "$0")/env.sh"; cd "$ROOT"
+WSLRUN_TIMEOUT=300
 end=$(date -d "$STOP_AT" +%s)
 LOGF="logs/${LABEL}_overnight.txt"
 snaps=()
@@ -23,9 +23,9 @@ prefix=$(wslrun "grep ^DR_LOCAL_S3_MODEL_PREFIX= ~/deepracer-for-cloud/run.env |
 wslrun "bash /tmp/snapshot.sh $prefix cedc-${LABEL}-final" >> "$LOGF" 2>&1
 snaps+=("cedc-${LABEL}-final")
 echo "== $(date +%T) evaluating: ${snaps[*]}" >> "$LOGF"
-wslrun "sed 's/\r$//' '/mnt/c/Users/Elyas/OneDrive - The University of Colorado Denver/Desktop/projects/GrandPrixChallenge/tools/wsl/bootstrap.sh' | bash > /dev/null"
+bootstrap > /dev/null
 for s in "${snaps[@]}"; do
-  MSYS_NO_PATHCONV=1 wsl.exe -d Ubuntu-22.04 -- bash /tmp/eval_candidates.sh "$LABEL" "$s" 2>&1 | tr -d '\0' >> "$LOGF"
+  wsl_exec bash /tmp/eval_candidates.sh "$LABEL" "$s" 2>&1 | tr -d '\0' >> "$LOGF"
 done
 python - "$LABEL" > "logs/${LABEL}_overnight_summary.txt" 2>&1 <<'PY'
 import json, sys

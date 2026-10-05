@@ -18,13 +18,13 @@ Edit only your own section. Times are local (Mountain Time).
 
 ---
 
-## Teammate: (machine)
+## Jason: RTX 3090 (DRfC in WSL2, repo inside WSL at ~/GrandPrixChallenge)
 
-**Updated:** —
+**Updated:** 2026-10-04 19:50
 
 | | |
 |---|---|
-| Training now | |
-| Last run | |
-| Next | |
-| Machine notes | |
+| Training now | **Model 15** (Stanley path-tracking expert on the racing line + Model 14b reward) from M13 wooc1-end, 19:45 → ~00:40 |
+| Last run | Model 14b (smooth/completion-first reward): all evals 100 % but not better than **Model 13 wooc1-end**, which stays our best (0 off on 6 tracks, 12.53 s; `submissions/cedc-m13-jason-wooc1-end.tar.gz`) |
+| Next | Evaluate M11 snapshots under practice-race rules + a textured world; if DR learns too slowly from scratch, fine-tune M10's best with DR (needs `cedc-m10-summit1-end` from Elyas) |
+| Machine notes | 1 simulator, 16 GB WSL. Repo lives inside WSL: tools now find the repo themselves (`tools/env.sh`) and run from Git Bash or WSL |

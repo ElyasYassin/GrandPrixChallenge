@@ -14,4 +14,4 @@ json.dump(d,open('/tmp/mm.json','w'),indent=2)"
 $A s3 cp --quiet /tmp/mm.json s3://bucket/$DST/model/model_metadata.json
 EVAL_MAX_S=$SECS bash /tmp/evalrun.sh $DST Vegas_track grip/s${STEER}-v${SPEED} > /dev/null 2>&1
 $A s3 rm --recursive --quiet s3://bucket/$DST/
-echo "done s${STEER} v${SPEED}: $(grep -c SIM_TRACE_LOG "/mnt/c/Users/Elyas/OneDrive - The University of Colorado Denver/Desktop/projects/GrandPrixChallenge/evals/grip/s${STEER}-v${SPEED}/robomaker.log") trace steps"
+echo "done s${STEER} v${SPEED}: $(grep -c SIM_TRACE_LOG "$(cat /tmp/gpc_root)/evals/grip/s${STEER}-v${SPEED}/robomaker.log") trace steps"

@@ -1,6 +1,7 @@
 # save trainer + simulator logs for the current run into the project
 PREFIX=$(grep "^DR_LOCAL_S3_MODEL_PREFIX=" ~/deepracer-for-cloud/run.env | cut -d= -f2)
-OUT="/mnt/c/Users/Elyas/OneDrive - The University of Colorado Denver/Desktop/projects/GrandPrixChallenge/logs/$PREFIX"
+ROOT=$(cat /tmp/gpc_root 2>/dev/null) || ROOT=$(cd "$(dirname "$0")/../.." && pwd)   # project root (set by bootstrap.sh)
+OUT="$ROOT/logs/$PREFIX"
 mkdir -p "$OUT"
 # write to a temp file first: never replace a saved log with an empty one (e.g. container already removed)
 save() { docker logs "$1" > /tmp/savelog.tmp 2>&1; [ -s /tmp/savelog.tmp ] && cp /tmp/savelog.tmp "$2"; }

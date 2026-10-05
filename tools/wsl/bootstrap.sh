@@ -1,6 +1,8 @@
 # Prepare WSL after a (re)start: install helpers into /tmp, DRfC temp dir, clean exited containers, start MinIO.
-# run from Windows:  wsl -d Ubuntu-22.04 -- bash "/mnt/c/.../tools/wsl/bootstrap.sh"
-HERE="/mnt/c/Users/Elyas/OneDrive - The University of Colorado Denver/Desktop/projects/GrandPrixChallenge/tools/wsl"
+# usage: bootstrap.sh [project-root-in-WSL]   (default: this script's repo)
+ROOT=${1:-$(cd "$(dirname "$0")/../.." && pwd)}
+HERE="$ROOT/tools/wsl"
+echo "$ROOT" > /tmp/gpc_root   # lets the helpers in /tmp find the project
 cp "$HERE"/*.sh /tmp/ && sed -i 's/\r$//' /tmp/*.sh
 mkdir -p /tmp/sagemaker && chmod g+w /tmp/sagemaker
 until docker info > /dev/null 2>&1; do sleep 2; done

@@ -11,7 +11,7 @@ MAX_SIM_MEM_MIB=${MAX_SIM_MEM_MIB:-9000}   # planned restart above this (WSL has
 STALL_MIN=${STALL_MIN:-8}                  # minutes without a new trainer episode -> full resume
 HARD_SIM_MEM_MIB=${HARD_SIM_MEM_MIB:-11000}  # restart the simulator even mid-iteration above this
 EPISODES_PER_ITER=20                       # hyperparameters.json num_episodes_between_training
-ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+source "$(dirname "$0")/env.sh"
 cd "$ROOT"
 # only one supervisor at a time: two would both auto-resume the same crash
 LOCK="$ROOT/logs/.supervise.pid"
@@ -20,20 +20,12 @@ if [ -f "$LOCK" ] && kill -0 "$(cat "$LOCK")" 2>/dev/null; then
 fi
 echo $$ > "$LOCK"
 trap 'rm -f "$LOCK"' EXIT
-wslrun() { MSYS_NO_PATHCONV=1 timeout 120 wsl.exe -d Ubuntu-22.04 -- bash -c "$1" | tr -d '\0\r'; }
 end=$(date -d "$STOP_AT" +%s)
 [ "$end" -le "$(date +%s)" ] && end=$((end + 86400))   # a stop time after midnight means tomorrow
 
 # WSL shuts its VM down when no Windows process is attached (even with Docker running inside),
-# which kills training. Keep one idle connection open for as long as we supervise.
-start_keepalive() {
-  MSYS_NO_PATHCONV=1 wsl.exe -d Ubuntu-22.04 -- bash -c 'exec sleep infinity' > /dev/null 2>&1 &
-  KEEPALIVE=$!
-}
-# WSL's /tmp is wiped on every WSL restart: (re)install helpers, DRfC temp dir, start MinIO
-bootstrap() {
-  wslrun "sed 's/\r$//' '/mnt/c/Users/Elyas/OneDrive - The University of Colorado Denver/Desktop/projects/GrandPrixChallenge/tools/wsl/bootstrap.sh' | bash"
-}
+# which kills training: start_keepalive keeps one idle connection open while we supervise.
+# WSL's /tmp is wiped on every WSL restart: bootstrap (re)installs helpers, DRfC temp dir, MinIO.
 start_keepalive
 trap 'rm -f "$LOCK"; kill $KEEPALIVE 2>/dev/null' EXIT
 bootstrap
@@ -53,7 +45,7 @@ while true; do
   rm -f "$(cygpath -u "$LOCALAPPDATA")/Temp/wsl-crashes/"*.dmp 2>/dev/null
   # WSL's virtual disk lives on C:. When C: filled up (2026-10-02 01:44) Linux got I/O errors and
   # crashed; stop cleanly (checkpoints are safe in MinIO) before that happens.
-  free_mib=$(df -BM /c | awk 'NR==2 {gsub("M","",$4); print $4}')
+  free_mib=$(df -BM "$C_DRIVE" | awk 'NR==2 {gsub("M","",$4); print $4}')
   if [ -n "$free_mib" ] && [ "$free_mib" -lt "${MIN_FREE_MIB:-2000}" ]; then
     wslrun "bash /tmp/drstop.sh"
     echo "STOPPED at $(date +%T): only ${free_mib} MiB free on C:"; exit 4
@@ -74,7 +66,7 @@ while true; do
     # ("Wsl/Service/CreateInstance/E_FAIL") until `wsl --shutdown`. After 3 failed checks, restart WSL.
     down=$(( ${down:-0} + 1 ))
     echo "$(date +%T) WSL not responding ($down)"
-    if [ "$down" -ge 3 ]; then
+    if [ "$down" -ge 3 ] && [ -z "${WSL_DISTRO_NAME:-}" ]; then   # (inside WSL we can't restart it)
       echo "$(date +%T) restarting WSL"; kill $KEEPALIVE 2>/dev/null
       wsl.exe --shutdown > /dev/null 2>&1; sleep 10
       start_keepalive; down=0; wsl_restarted=1
@@ -116,6 +108,14 @@ while true; do
   fi
   if [ "${trainer:-0}" -gt 0 ] && { [ "${exited:-0}" -gt 0 ] || { [ "${mem:-0}" -gt "$MAX_SIM_MEM_MIB" ] && { [ "$at_boundary" -eq 1 ] || [ "${mem:-0}" -gt "$HARD_SIM_MEM_MIB" ]; }; }; }; then
     simrestarts=$((simrestarts + 1))
+    # Multi-worker runs (DR_WORKERS > 1): the workers meet once at start-up, a restarted simulator never
+    # rejoins and both stop (seen 2026-10-04). Do a full resume from the last checkpoint instead (at an
+    # iteration boundary, so little is lost); not counted against MAX_RESUMES, it is planned upkeep.
+    if [ $(( ${running:-0} + ${exited:-0} )) -gt 1 ]; then
+      new=$(wslrun "bash /tmp/autoresume.sh" | tail -1)
+      echo "$(date +%T) simulators ${mem} MiB, exited=${exited} (multi-worker) -> full resume as $new (#$simrestarts)"
+      last_teps=x; sleep 60; continue
+    fi
     if [ "${teps:-0}" = "${restart_teps:-x}" ]; then fruitless=$(( ${fruitless:-0} + 1 )); else fruitless=1; restart_teps=$teps; fi
     msg=$(wslrun "bash /tmp/simrestart.sh" | tail -1)
     echo "$(date +%T) simulator ${mem} MiB, exited=${exited} -> $msg (#$simrestarts)"
