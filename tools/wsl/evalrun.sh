@@ -19,7 +19,7 @@ if [ -n "$CKPT" ]; then
   python3 -c "import json;d=json.load(open('/tmp/ckpt.orig.json'));d['best_checkpoint']={'name':'$CKPT.ckpt','avg_eval_metric':None,'time_stamp':0};json.dump(d,open('/tmp/ckpt.json','w'))"
   $A s3 cp /tmp/ckpt.json s3://bucket/$PREFIX/model/deepracer_checkpoints.json > /dev/null
 fi
-sed -i "s/^DR_LOCAL_S3_MODEL_PREFIX=.*/DR_LOCAL_S3_MODEL_PREFIX=$PREFIX/; s/^DR_WORLD_NAME=.*/DR_WORLD_NAME=$WORLD/; s/^DR_EVAL_CHECKPOINT=.*/DR_EVAL_CHECKPOINT=best/" run.env
+sed -i "s/^DR_LOCAL_S3_MODEL_PREFIX=.*/DR_LOCAL_S3_MODEL_PREFIX=$PREFIX/; s/^DR_WORLD_NAME=.*/DR_WORLD_NAME=$WORLD/; s/^DR_EVAL_CHECKPOINT=.*/DR_EVAL_CHECKPOINT=best/; s/^DR_ENABLE_DOMAIN_RANDOMIZATION=.*/DR_ENABLE_DOMAIN_RANDOMIZATION=False/" run.env
 source bin/activate.sh > /tmp/act.log 2>&1
 dr-start-evaluation -q > /dev/null 2>&1
 sleep 20

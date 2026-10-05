@@ -12,6 +12,8 @@ python3 -c "import ast,json;ast.parse(open('custom_files/reward_function.py').re
 # always set the world explicitly (evaluations may leave another track in run.env); Vegas unless a world is given.
 # "A+B" trains one model on several tracks at once: one simulator (worker) per track (DRfC multi-config);
 # workers 2.. copy domain randomization and direction settings from run.env
+# optional: DR=True|False sets domain randomization for this run (workers 2.. copy it below)
+[ -n "${DR:-}" ] && sed -i "s/^DR_ENABLE_DOMAIN_RANDOMIZATION=.*/DR_ENABLE_DOMAIN_RANDOMIZATION=$DR/" run.env
 IFS=+ read -r -a WORLDS <<< "${5:-Vegas_track}"
 sed -i "s/^DR_WORLD_NAME=.*/DR_WORLD_NAME=${WORLDS[0]}/" run.env
 sed -i "s/^DR_WORKERS=.*/DR_WORKERS=${#WORLDS[@]}/" system.env
@@ -30,7 +32,7 @@ sed -i "s/^DR_LOCAL_S3_MODEL_PREFIX=.*/DR_LOCAL_S3_MODEL_PREFIX=$2/; s/^DR_LOCAL
 [ "$3" = none ] && sed -i "s/^DR_LOCAL_S3_PRETRAINED=.*/DR_LOCAL_S3_PRETRAINED=False/" run.env
 [ -n "${6:-}" ] && sed -i "s/\"lr\": [0-9.e-]*/\"lr\": $6/" custom_files/hyperparameters.json
 grep -o '"lr": [0-9.e-]*' custom_files/hyperparameters.json
-grep -E "^DR_(LOCAL_S3_MODEL_PREFIX|LOCAL_S3_PRETRAINED|LOCAL_S3_PRETRAINED_PREFIX|LOCAL_S3_PRETRAINED_CHECKPOINT|WORLD_NAME|TRAIN_ALTERNATE_DRIVING_DIRECTION|WORKERS)=" run.env system.env
+grep -E "^DR_(ENABLE_DOMAIN_RANDOMIZATION|LOCAL_S3_MODEL_PREFIX|LOCAL_S3_PRETRAINED|LOCAL_S3_PRETRAINED_PREFIX|LOCAL_S3_PRETRAINED_CHECKPOINT|WORLD_NAME|TRAIN_ALTERNATE_DRIVING_DIRECTION|WORKERS)=" run.env system.env
 source bin/activate.sh > /tmp/act.log 2>&1
 dr-upload-custom-files > /dev/null 2>&1
 dr-start-training -q -w 2>&1 | grep -E "Started|rror" | tail -2

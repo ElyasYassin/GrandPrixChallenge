@@ -2,6 +2,7 @@
 # Train one run across several tracks in turn (one simulator, so tracks take turns). Each leg is a new
 # DRfC run on its own world, pretrained from the previous leg's last checkpoint, kept alive by
 # supervise.sh, snapshotted every SNAP_MIN minutes and at its end as cedc-<label>-<tag>-HHMM.
+# DR=True|False sets domain randomization; CLEAN_RUNS=1 deletes each leg's run prefix after its -end snapshot.
 # A world "A+B" trains on both tracks at once (one simulator each). PRE=none trains the first leg from scratch; LR=<lr> sets the learning rate (custom_files/hyperparameters.json).
 # Run from the project root in Git Bash:
 #   bash tools/track_rotation.sh <expdir> <label> <pretrained-prefix> <ckpt: best|last> <world:tag:minutes[:lr]>...
@@ -27,7 +28,7 @@ for leg in "$@"; do
   # reinstall helpers if WSL restarted anyway (start_run.sh must exist before the leg starts)
   wslrun "[ -f /tmp/start_run.sh ] && echo ok" | grep -q ok || bootstrap > /dev/null
   { echo "== $(date +%T) leg $tag: $world for $minutes min, lr ${lr:-${LR:-unchanged}} (until $stop_at), from $PRE ($CKPT)"
-    wsl_exec bash /tmp/start_run.sh "$EXP" "$prefix" "$PRE" "$CKPT" "$world" "${lr:-${LR:-}}" | tr -d '\0'; } >> "$LOGF" 2>&1
+    wsl_exec env DR=${DR:-} bash /tmp/start_run.sh "$EXP" "$prefix" "$PRE" "$CKPT" "$world" "${lr:-${LR:-}}" | tr -d '\0'; } >> "$LOGF" 2>&1
   sup_out="logs/${LABEL}_${tag}_supervise.txt"
   # world "A+B": one simulator per track; each leaks memory, so restart them earlier (WSL has 16 GB)
   hard=8500; [[ "$world" == *+* ]] && hard=6000
@@ -47,5 +48,12 @@ for leg in "$@"; do
   # supervisor auto-resumes may have renamed the run (<prefix>-2, ...): continue from whatever is current
   PRE=$(curprefix); CKPT=last
   wslrun "bash /tmp/snapshot.sh $PRE cedc-${LABEL}-${tag}-end" >> "$LOGF" 2>&1
+  # CLEAN_RUNS=1: continue from the -end snapshot and delete this leg's ~280 MB run prefixes
+  # (the leg's prefix and auto-resume renames <prefix>-2, ...) so long rotations don't fill the disk
+  if [ "${CLEAN_RUNS:-0}" = 1 ] && wslrun "aws --profile minio --endpoint-url http://localhost:9000 s3 ls s3://bucket/cedc-${LABEL}-${tag}-end/model/ | grep -c ckpt.index" | grep -q "^[1-9]"; then
+    runs="$prefix"; for n in 2 3 4 5 6; do runs="$runs $prefix-$n"; done
+    PRE="cedc-${LABEL}-${tag}-end"
+    wslrun "bash /tmp/rmprefix.sh $runs" | grep deleted >> "$LOGF"
+  fi
 done
 echo "== $(date +%T) rotation done" >> "$LOGF"
