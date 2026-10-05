@@ -11,7 +11,7 @@ Edit only your own section. Times are local (Mountain Time).
 | | |
 |---|---|
 | Training now | Nothing (C: drive ~2.8 GB free) |
-| Last run | **J16b** (your 7.130 model + your settings, two simulators, 4.8 h): `ws1-end` 12/12 laps, **10 off-tracks vs 24** for the 7.130 model, **10.01 vs 11.19 s** mean on wide / base / rI2024 / Vegas (same eval settings). Packaged for portal: `submissions/cedc-m16b-jason-ws1-end.tar.gz`, `…-wbo1-end.tar.gz` |
+| Last run | Model 07 (off-track penalty + edge safety): no clear gain over M05 snap2 in 5 trials × 6 tracks |
 | Best on portal | **Model 10 variety c2-end (ckpt 199): 7.130**, best lap 6.740 (#33). Leaderboard keeps the best submission |
 | Next | Evaluate M08 snapshots on held-out tracks (reInvent2019, reinvent_base, 2022_reinvent_champ_ccw); check zig-zag numbers |
 | Machine notes | 1 simulator only (CPU); simulator leaks memory with GPU rendering → `tools/supervise.sh` restarts it at iteration boundaries |
@@ -20,12 +20,12 @@ Edit only your own section. Times are local (Mountain Time).
 
 ## Jason: RTX 3090 (DRfC in WSL2, repo inside WSL at ~/GrandPrixChallenge)
 
-**Updated:** 2026-10-05 08:35
+**Updated:** 2026-10-05 12:55
 
 | | |
 |---|---|
-| Training now | **Model J18** (physical race): J16b ws1-end + carpet/wood floors with wide/base, your settings otherwise, 08:35 → ~12:40 |
-| Last run | **J16b** (your 7.130 model + your settings, two simulators, 4.8 h): `ws1-end` 12/12 laps, **10 off-tracks vs 24** for the 7.130 model, **10.01 vs 11.19 s** mean on wide / base / rI2024 / Vegas (same eval settings). Packaged for portal: `submissions/cedc-m16b-jason-ws1-end.tar.gz`, `…-wbo1-end.tar.gz` |
+| Training now | **Model J19**: J17 wv1-end + your recipe, almost only reInvent2019_wide + reinvent_base, two simulators, 12:38 → ~16:45 (picked by 5-trial evals for reliability) |
+| Last run | **J17 wv1-end → portal 7.389 / 6.800** (#42, thanks for logging it). J18 (texture fine-tune for the physical race) did not learn carpet/wood in 4 h with the fast 7.130 line (training ~30 % flat); dropped at Jason's request, lap record first |
 | Next | Evaluate Model J15 (~01:30). Then, per Elyas's 7.130 finding: short tracks (reInvent2019_wide, reinvent_base) in every rotation, and textured-floor training on top of the 7.130 model if its checkpoint can be shared (questions below) |
 | Machine notes | Two simulators per run (DRfC multi-config, one track each), 16 GB WSL, C: has ~570 GB free (happy to run long jobs). Repo lives inside WSL: tools now find the repo themselves (`tools/env.sh`) and run from Git Bash or WSL |
 
@@ -47,3 +47,6 @@ J17 (ws1-end + 4 h more, same recipe): on wide + base **wv1-end 2 off-tracks / 7
 3. **Want me to keep running your recipe with two simulators** (I have ~570 GB free and a free 3090 most of the time)? Tell me a start checkpoint + tracks and I'll claim it here.
 4. **Physical race (Oct 8):** your 7.130 model leaves the carpet floor 4–5× per lap (wide: 1–2). My texture recipe (J13: carpet/wood in training, off-tracks 27 → 4, held-out concrete 12 → 4) could be applied to the final portal pick before the race. Do we know anything about the real track surface?
 5. **Shared tools changed** (two simulators via `world A+B`, no hard-coded Windows path via `tools/env.sh`; single-track runs behave as before). Please do one dry `bash tools/supervise.sh` start after pulling.
+
+**2026-10-05 12:55 · Jason → Elyas:** agreed, the 7.130 line looks plateaued at ~6.7–6.8 s on the portal (wv1-end 7.389 / 6.800 despite fewer local off-tracks). Your Model 13 has the pace (6.333 best lap) but not the reliability yet. **Proposal:** share `cedc-m13-w4-end` (portal bundle is fine, `tools/wsl/import_bundle.sh` loads it) and I'll run it on my two simulators with your M13 reward/actions on the short tracks, lr 0.0001, to buy reliability (that's what two simulators did for the 7.130 line locally: 24 → 10 off-tracks). Or tell me which run you'd rather I take. (Also: my script had overwritten your "Last run" row this morning; restored now, sorry.)
+
