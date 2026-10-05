@@ -66,12 +66,17 @@ pre{flex:1 1 420px;margin:0;overflow-x:auto;background:#000;padding:12px;border:
  <pre id=t>loading…</pre>
 </div>
 <script>
-const cam = t => `/stream?topic=${t}&width=480&height=360&quality=60&t=${Date.now()}`;
-const v = document.getElementById('v'), c = document.getElementById('c');
-// raw camera topics: published in training and evaluation (the kvs/main_camera_stream overlays are training-only)
-function video(){ v.src = cam('/racecar/main_camera/zed/rgb/image_rect_color'); c.src = cam('/racecar/camera/zed/rgb/image_rect_color'); }
-v.onerror = c.onerror = () => setTimeout(video, 15000);
-video(); setInterval(video, 300000);  // reconnect every 5 min (simulator restarts drop the stream)
+// single JPEG frames, fetched one after another: works through any proxy (the Windows <-> WSL
+// localhost relay did not pass the MJPEG stream) and recovers by itself after simulator restarts
+function poll(img, topic){
+  const next = () => setTimeout(load, 120);
+  const load = () => { img.src = `/snap?topic=${topic}&t=${Date.now()}`; };
+  img.onload = next; img.onerror = () => setTimeout(load, 3000);
+  load();
+}
+function video(){}  // kept for the reload button (polling reloads itself)
+poll(document.getElementById('v'), '/racecar/main_camera/zed/rgb/image_rect_color');
+poll(document.getElementById('c'), '/racecar/camera/zed/rgb/image_rect_color');
 async function table(){ try { document.getElementById('t').textContent = await (await fetch('/text')).text(); } catch(e) {} }
 table(); setInterval(table, 30000);
 </script>
@@ -80,6 +85,8 @@ table(); setInterval(table, 30000);
 
 class Handler(BaseHTTPRequestHandler):
     def do_GET(self):
+        if self.path.startswith("/snap"):
+            return self.snap()
         if self.path.startswith("/stream"):
             return self.relay()
         if self.path.startswith("/text"):
@@ -91,6 +98,23 @@ class Handler(BaseHTTPRequestHandler):
         self.send_response(200)
         self.send_header("Content-Type", ctype)
         self.send_header("Content-Length", str(len(data)))
+        self.end_headers()
+        self.wfile.write(data)
+
+    def snap(self):  # one JPEG from the simulator's web video server (same origin as the page)
+        port = sim_port()
+        try:
+            q = self.path.split("?", 1)[1] if "?" in self.path else ""
+            data = urllib.request.urlopen(f"http://127.0.0.1:{port}/snapshot?{q}", timeout=5).read() if port else None
+        except OSError:
+            data = None
+        if not data:
+            self.send_error(503, "simulator not running (restarting?)")
+            return
+        self.send_response(200)
+        self.send_header("Content-Type", "image/jpeg")
+        self.send_header("Content-Length", str(len(data)))
+        self.send_header("Cache-Control", "no-store")
         self.end_headers()
         self.wfile.write(data)
 
