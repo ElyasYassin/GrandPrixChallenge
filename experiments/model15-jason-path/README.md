@@ -30,4 +30,4 @@ From the best Model 14b snapshot (evaluation decides), two workers, DR on, Vegas
 
 ## Results
 
-(pending)
+**Stopped 21:52 (2.5 legs) for Model J16** (Elyas's 7.130 model arrived). First leg (Vegas + rI2024) equal to Model 14b; second leg (Vegas + carpet) worse than 14b (Vegas 69 → 58 %, carpet 51 → 41 % vs 14b 73–91 % / 73–79 %), likely the policy relearning after the expert change at lr 0.0003. Not evaluated. Snapshots: `cedc-m15-jason-vc1-end`, `-vk1-2101`, `-vk1-end`, `-rs1-stop`. Elyas's 11c tested the same idea (pure pursuit) on the 7.130 line.
