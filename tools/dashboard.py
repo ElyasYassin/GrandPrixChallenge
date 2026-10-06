@@ -17,6 +17,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from progress import report  # noqa: E402
 
 PORT = int(sys.argv[2]) if len(sys.argv) > 2 else 18081
+SNAP_MIN_S = 0.5   # at most 2 simulator frame requests per second per camera
 RUN_ENV = Path.home() / "deepracer-for-cloud" / "run.env"
 
 
@@ -93,7 +94,7 @@ pre{flex:1 1 420px;margin:0;overflow-x:auto;background:#000;padding:12px;border:
 // single JPEG frames, fetched one after another: works through any proxy (the Windows <-> WSL
 // localhost relay did not pass the MJPEG stream) and recovers by itself after simulator restarts
 function poll(img, topic){
-  const next = () => setTimeout(load, 120);
+  const next = () => setTimeout(load, 500);
   const load = () => { img.src = `/snap?topic=${topic}&t=${Date.now()}`; };
   img.onload = next; img.onerror = () => setTimeout(load, 3000);
   load();
@@ -126,29 +127,44 @@ class Handler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(data)
 
+    frames = {}   # topic -> (time, jpeg): the simulators' web_video_server jams (100 % CPU, no answers)
+                  # when polled fast, so ask it at most every SNAP_MIN_S per topic and reuse the frame
+
     def snap(self):  # one JPEG from the simulator's web video server (same origin as the page)
-        # with two simulators one video server sometimes stops answering: ask the one that answered
-        # last time first (otherwise every frame waits for the hung one to time out)
         q = self.path.split("?", 1)[1] if "?" in self.path else ""
-        data = None
-        ports = sim_ports()
-        ports.sort(key=lambda p: p != Handler.good_port)
-        for port in ports:
-            try:
-                data = urllib.request.urlopen(f"http://127.0.0.1:{port}/snapshot?{q}", timeout=2).read()
-                Handler.good_port = port
-                break
-            except OSError:
-                continue
-        if not data:
-            self.send_error(503, "simulator not running (restarting?)")
-            return
+        topic = next((kv.split("=", 1)[1] for kv in q.split("&") if kv.startswith("topic=")), "")
+        cached = Handler.frames.get(topic)
+        if cached and time.time() - cached[0] < SNAP_MIN_S:
+            return self.send_jpeg(cached[1])
+        data = self.fetch_frame(f"topic={topic}")
+        if data:
+            Handler.frames[topic] = (time.time(), data)
+            return self.send_jpeg(data)
+        if cached and time.time() - cached[0] < 30:
+            return self.send_jpeg(cached[1])
+        self.send_error(503, "simulator not running (restarting?)")
+
+    def send_jpeg(self, data):
         self.send_response(200)
         self.send_header("Content-Type", "image/jpeg")
         self.send_header("Content-Length", str(len(data)))
         self.send_header("Cache-Control", "no-store")
         self.end_headers()
         self.wfile.write(data)
+
+    def fetch_frame(self, q):
+        # with two simulators one video server sometimes stops answering: ask the one that answered
+        # last time first (otherwise every frame waits for the hung one to time out)
+        ports = sim_ports()
+        ports.sort(key=lambda p: p != Handler.good_port)
+        for port in ports:
+            try:
+                data = urllib.request.urlopen(f"http://127.0.0.1:{port}/snapshot?{q}", timeout=2).read()
+                Handler.good_port = port
+                return data
+            except OSError:
+                continue
+        return None
 
     def relay(self):  # copy the simulator's MJPEG stream through (same origin and port as the page)
         port = sim_port()
