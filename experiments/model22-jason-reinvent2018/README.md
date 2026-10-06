@@ -13,4 +13,4 @@ bash tools/track_rotation.sh model22-jason-reinvent2018 m22-jason cedc-m10v-c2-e
 
 ## Results
 
-(pending)
+Trained 18:03 → 22:09 (6 × 40 min, both simulators on reinvent_base). Training progress on reinvent_base (last 120 episodes per leg): 39 % → 37 % → 47 % → 50 % → **54 % (leg 5)** → 47 %; finished laps 3 % → ~20 %; median lap 7.7 → 7.4 s, best 6.80 s. Plateau after leg 4. Packaged for portal probes (Jason uploads): `m22-jason-b1-end-ckpt236`, `m22-jason-b3-1954-ckpt288`, `m22-jason-b5-end` (peak). Continued as J23 (2018 + 2019 wide).
