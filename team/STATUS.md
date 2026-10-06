@@ -76,16 +76,14 @@ Proposal: **continue Model 13 on your machine with two simulators** (the setup t
 
 Open questions for the professor (Elyas asks): does the physical race decide the winner; which submission goes on the car; what are the "adjustments"; what is the physical track/surface?
 
-### For Jason (from Elyas's machine, 2026-10-06 17:30): please run Model 17 tonight
+### For Jason (from Elyas's machine, 2026-10-06 17:45): tonight = Model 14b unchanged on your two simulators (replaces the 17:30 Model 17 note)
 
-Portal today: **#54 your J27 wb3-end 6.531 / 6.407, clean** (wb1-end #53 10.032 / 6.727, 1 off). Nice reliability gain from wb1 → wb3, but the slower sharp turns cost ~0.14 s/lap vs m14b-w8-end (6.338 / 6.270), and the gap to the leader (5.61) is pure pace (~0.7 s). So we'd like your two simulators on the **speed** bet tonight:
+Portal today: **#54 your J27 wb3-end 6.531 / 6.407, clean** (wb1-end #53 10.032 / 6.727, 1 off). Two simulators clearly bought reliability (wb1 → wb3), but the slower sharp turns cost ~0.14 s/lap vs m14b-w8-end (6.338 / 6.270). We want **speed and reliability**, so:
 
-**Model 17 (k-means actions, from scratch)**: `experiments/model17-cluster/` (reward = Model 14b's, 12 actions from clustering the expert's commands, top 4 m/s; details in its README). Suggested run, no DR:
+**Please run J26 as originally planned, overnight:** `m14b-w8-end` with the **unchanged Model 14b recipe** (`experiments/model14b-cap4/`: reward + 15 actions, original corner speeds 30° 2.5 / 20° 2.9), **two simulators `reInvent2019_wide+reinvent_base`**, no DR, lr 0.0001, snapshots every 30 min, until morning. 14b was still improving when it stopped (A to Z 62 → 70 % laps), and your two simulators add the reliability J27 showed.
 
-```
-DR=False CLEAN_RUNS=1 SNAP_MIN=30 bash tools/track_rotation.sh model17-cluster m17-jason none best   reInvent2019_wide+reinvent_base:wb1:60:0.0003 reInvent2019_wide+reinvent_base:wb2:60:0.0003 ... (lr 0.0003 for ~4 h, then 0.0001) until morning
-```
+Model 17 (12 k-means actions) is **dropped**: closed-loop the expert is no faster with it (A to Z 4.82 vs 4.78 s, re:Invent 2018 5.47 vs 5.13), and it would have to start from scratch. Our gap is the policy (6.27 s vs ~4.8 s expert), not the action set.
 
-Snapshots every 30 min; we upload the best after midnight (5 uploads on Oct 7). Test them on A to Z (5 trials) as you've been doing; pace on A to Z has tracked the portal best for us.
+**Elyas's machine:** E3 (Model 16, free racing: lap-time reward, no imitation, from m14b-w8-end) — 18:15 A to Z test vs m14b-w8-end (one upload left today), then continues overnight until ~08:30.
 
-**Elyas's machine** keeps going with **E3 (Model 16, free racing: lap-time reward, no imitation, from m14b-w8-end)**: 18:15 A to Z test of its snapshots vs m14b-w8-end (one upload left today), then E3 continues overnight (A to Z / re:Invent 2018, 30-min legs, until ~08:30).
+**Tomorrow after midnight:** test both machines' snapshots on A to Z (5 trials: fewest off-tracks, then mean lap), upload the best 2–3; then the physical candidate.
