@@ -28,8 +28,20 @@ def base() -> str:
     return re.sub(r"-[a-z]+\d+(-\d+)?$", "", m[1].strip()) if m else "cedc-"
 
 
+_ports_cache = (0.0, [])
+
+
 def sim_ports():
-    """Host ports of all running simulators' video servers (training or evaluation)."""
+    """Host ports of all running simulators' video servers (training or evaluation); the docker
+    lookups take ~0.5 s, so the answer is reused for 10 s."""
+    global _ports_cache
+    if time.time() - _ports_cache[0] < 10:
+        return list(_ports_cache[1])
+    _ports_cache = (time.time(), _sim_ports())
+    return list(_ports_cache[1])
+
+
+def _sim_ports():
     names = subprocess.run(["docker", "ps", "--filter", "name=robomaker", "--format", "{{.Names}}"],
                            capture_output=True, text=True).stdout.split()
     ports = []
@@ -96,6 +108,7 @@ table(); setInterval(table, 30000);
 
 
 class Handler(BaseHTTPRequestHandler):
+    good_port = None
     def do_GET(self):
         if self.path.startswith("/snap"):
             return self.snap()
@@ -114,12 +127,16 @@ class Handler(BaseHTTPRequestHandler):
         self.wfile.write(data)
 
     def snap(self):  # one JPEG from the simulator's web video server (same origin as the page)
-        # with two simulators one video server sometimes stops answering: take the first that does
+        # with two simulators one video server sometimes stops answering: ask the one that answered
+        # last time first (otherwise every frame waits for the hung one to time out)
         q = self.path.split("?", 1)[1] if "?" in self.path else ""
         data = None
-        for port in sim_ports():
+        ports = sim_ports()
+        ports.sort(key=lambda p: p != Handler.good_port)
+        for port in ports:
             try:
                 data = urllib.request.urlopen(f"http://127.0.0.1:{port}/snapshot?{q}", timeout=2).read()
+                Handler.good_port = port
                 break
             except OSError:
                 continue
