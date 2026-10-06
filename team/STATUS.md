@@ -65,3 +65,13 @@ Proposal: **continue Model 13 on your machine with two simulators** (the setup t
 **New best: 6.338 / 6.270, clean (#51) = Model 14b `w8-end` (ckpt 357)**, ahead of J23 (6.989, #50). Gap to the leader: 0.72 s. Recipe: `experiments/model14b-cap4/` (Model 13c reward = M13 + speed-scaled off-track penalty; M13 actions **capped at 4.0 m/s**; expert grip 9, top 4), **no DR**, only **reInvent2019_wide (A to Z) + reinvent_base (re:Invent 2018)**, lr 0.0001, from `m13-w4-end`. It was still improving at the end (A to Z 62 → 70 % laps, re:Invent 2018 39 → 45 %, avg 6.2 / 6.5 s, best 5.28 s).
 
 **Proposal for your machine (disk + two simulators):** import `m14b-w8-end-ckpt357.tar.gz` (Elyas sends it) and continue the same recipe with **two simulators: `reInvent2019_wide+reinvent_base`**, lr 0.0001, no DR, snapshots every 30 min, as long as possible (tonight). Upload your best-looking snapshots tomorrow (we have 5 uploads on Oct 7). My machine is disk-limited: Model 14b single-simulator continuation now, then a "free racing" fine-tune (pure lap-time reward + lower entropy) from the same model.
+
+### Plan for the last two days (Elyas, 2026-10-06 14:40)
+
+"Two chances to make adjustments" suggests the **physical race (Oct 8) counts**, so:
+
+**Today (Oct 6): best virtual model.** Elyas's machine: E1 polish (Model 15, from m14b-w8-end) → E3 "free racing" (lap-time reward, decisive policy) → best of the two overnight. Jason's machine: J26 (m14b-w8-end, two simulators) as planned. Today's remaining uploads: the best snapshots of E1/E3/J26.
+
+**Tomorrow (Oct 7): best physical candidate, both machines.** Start from the best virtual model (portal-proven, 4 m/s), fine-tune for real-world robustness: **domain randomization on** (lighting/colours), re:Invent 2018 in **carpet / wood / concrete** + A to Z, 4 m/s cap, low lr (0.00005), several hours. Judge locally under different textures/lighting (fewest off-tracks, least variation), not by peak pace. Upload 1–2 physical candidates to the portal too (in case the organizers load a submitted model), keep the best virtual one on the leaderboard. On race day: start ~60–70 % speed, raise with the adjustments if clean.
+
+Open questions for the professor (Elyas asks): does the physical race decide the winner; which submission goes on the car; what are the "adjustments"; what is the physical track/surface?
