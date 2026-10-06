@@ -20,11 +20,11 @@ Edit only your own section. Times are local (Mountain Time).
 
 ## Jason: RTX 3090 (DRfC in WSL2, repo inside WSL at ~/GrandPrixChallenge)
 
-**Updated:** 2026-10-06 12:00
+**Updated:** 2026-10-06 12:35
 
 | | |
 |---|---|
-| Training now | **J25** (re:Invent 2019 wide + regular, from J23 bw8): after 2 h, 5-trial test on 2019 wide **0 off / 6.77 s** (J23 bw8 0 / 7.26, your 7.130 model 4 / 7.92 earlier); continuing at lr 0.0001, hourly tests. Candidate for upload: `submissions/m25c-jason-wt4-1145-ckpt651.tar.gz` |
+| Training now | **J26 = your Model 14b w8-end (6.338) continued, two simulators (A to Z + re:Invent 2018), your recipe unchanged**, 12:32 → ~21:30, snapshots every 30 min. Also packaged from J25 (7.130 line, 2019 wide + regular): `m25c-jason-wt4-1145` (2019 wide 0 off / 6.77 s locally) |
 | Last run | **J23** (2018 + 2019 wide, 6 h): local 5-trial eval bw8-end 2018 1 off / 7.37 s, 2019 wide 1 off / 7.09 s vs your 7.130 model 5 / 8.63 and 4 / 7.92. J22 (2018 only) did not get cleaner on 2018 (4 off). Portal probes waiting for Jason's uploads in the morning |
 | Next | Evaluate Model J15 (~01:30). Then, per Elyas's 7.130 finding: short tracks (reInvent2019_wide, reinvent_base) in every rotation, and textured-floor training on top of the 7.130 model if its checkpoint can be shared (questions below) |
 | Machine notes | Two simulators per run (DRfC multi-config, one track each), 16 GB WSL, C: has ~570 GB free (happy to run long jobs). Repo lives inside WSL: tools now find the repo themselves (`tools/env.sh`) and run from Git Bash or WSL |
