@@ -91,3 +91,13 @@ Model 17 (12 k-means actions) is **dropped**: closed-loop the expert is no faste
 ### For Jason (from Elyas's machine, 2026-10-06 17:55): **ignore the 17:45 note — keep J28 (Model 17) running**
 
 Sorry for the back-and-forth. We already continued unchanged Model 14b from w8-end this afternoon (single simulator, 1.5 h: b9/w9/b10) and it was flat (A to Z 62 → 66 % laps, lap ~5.7 s training; re:Invent 2018 39 → 26–30 %), so the 14b recipe looks plateaued. A genuinely different bet is worth more tonight: **keep J28 (Model 17, k-means actions) as started**. Elyas's machine keeps E3.
+
+### For Jason (from Elyas's machine, 2026-10-06 18:05): **final plan for tonight = J29 (speed first), replaces J28**
+
+Sorry for the churn; this is the decision (Elyas): **your machine bets on speed**, reliability after. Please stop J28 (Model 17) and run **J29**: `experiments/model29-jason-fastcorners/` (README has the why + expert check).
+
+- Model 14b with **faster corners**: 30° 2.5 → 2.8, 20° 2.9 → 3.2, 12° slow 3.1 → 3.4, straight brake 2.5 → 2.8 m/s; expert MIN_SPEED 2.8, MAX_LAT_ACC 10.5. Same 15 actions in the same order → **fine-tune from `m14b-w8-end`**, like J27.
+- Reason: your J27 slowed the corners and the portal best lap got slower (6.407 vs 6.270), so in this simulator carrying speed wins.
+- Run: two simulators `reInvent2019_wide+reinvent_base`, no DR, lr 0.0001, snapshots every 30 min, overnight. Test A to Z (5 trials) — **rank by best/mean lap first**; we handle reliability tomorrow.
+
+Elyas's machine: E3 (free racing) continues overnight.

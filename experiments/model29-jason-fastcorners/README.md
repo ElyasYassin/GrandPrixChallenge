@@ -1,0 +1,30 @@
+# Model J29: Model 14b with faster corners (speed first, for Jason's two simulators)
+
+**Why (Elyas, 2026-10-06 18:00):** speed first, reliability after. Portal evidence: J27 slowed the sharp turns to stay within the measured grip and its best lap got **slower** (wb3-end 6.407 vs m14b-w8-end 6.270, both clean). In this simulator a car that slides a little but carries speed through the corner is quicker, so go the other way.
+
+**Change vs Model 14b (`experiments/model14b-cap4`):**
+
+| Action | 14b | J29 |
+|---|---|---|
+| ±30° | 2.5 | **2.8** |
+| ±20° | 2.9 | **3.2** |
+| ±12° (slow) | 3.1 | **3.4** |
+| 0° brake | 2.5 | **2.8** |
+| ±12° fast, ±6°, 0° 3.6 / 4.0 | unchanged | unchanged |
+
+Same 15 actions in the same order, so it **fine-tunes from `m14b-w8-end`** (like J27). Expert: `MIN_SPEED` 2.5 → 2.8, `MAX_LAT_ACC` 9.0 → 10.5. Everything else is Model 14b.
+
+**Closed-loop expert check** (`tools/expert_closed_loop.py`, kinematic car, 1-step delay, 5° steering noise, 3 seeds):
+
+| | A to Z lap / offs | re:Invent 2018 lap / offs |
+|---|---|---|
+| 14b | 7.3 s / 1.3 | 10.4 s / 4.7 |
+| J29 | **6.9 s / 1.0** | 12.6 s / 7.3 |
+
+Faster on A to Z (the layout closest to the secret track), worse in re:Invent 2018's tight hairpins: expected for a speed-first bet.
+
+**Run:** two simulators `reInvent2019_wide+reinvent_base`, no DR, lr 0.0001, snapshots every 30 min, overnight, from `m14b-w8-end` (last). Judge on A to Z lap time first (5 trials); reliability work tomorrow (clean-snapshot screening, short low-lr fine-tune).
+
+## Results
+
+(pending)
