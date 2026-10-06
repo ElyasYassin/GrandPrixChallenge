@@ -10,7 +10,7 @@ MAX_RESUMES=20
 MAX_SIM_MEM_MIB=${MAX_SIM_MEM_MIB:-9000}   # planned restart above this (WSL has 16 GB); override via env
 STALL_MIN=${STALL_MIN:-8}                  # minutes without a new trainer episode -> full resume
 HARD_SIM_MEM_MIB=${HARD_SIM_MEM_MIB:-11000}  # restart the simulator even mid-iteration above this
-EPISODES_PER_ITER=20                       # hyperparameters.json num_episodes_between_training
+EPISODES_PER_ITER=${EPISODES_PER_ITER:-20}  # must match hyperparameters.json num_episodes_between_training
 source "$(dirname "$0")/env.sh"
 cd "$ROOT"
 # only one supervisor at a time: two would both auto-resume the same crash
