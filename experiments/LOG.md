@@ -48,6 +48,7 @@ One row per trained model. Change **one idea** per model.
 | 50 | 2026-10-06 11:41 | Jason J23 bw8-end (7.130 line, A to Z + re:Invent 2018, two simulators) | 100% | 6.989 | 6.801 |
 | 51 | 2026-10-06 11:42 | **Model 14b w8-end ckpt 357** (4 m/s cap, A to Z + re:Invent 2018, from M13 w4-end) | 100% | **6.338** | **6.270** |
 | 53 | 2026-10-06 17:15 | Jason J27 wb1-end ckpt 388 (14b + sharp turns 30° 2.2 / 20° 2.7 m/s, 45 min; locally 1 off / 7.05 s on A to Z vs w8-end 3 / 7.70) | 100% | 10.032 | 6.727 |
+| 54 | 2026-10-06 17:20 | Jason J27 wb3-end ckpt 447 (same, 2 h 15 min; locally 1 off / 6.63 s on A to Z) | 100% | 6.531 | 6.407 |
 
 Leader (2026-09-30): Shallow Learner, 100%, 5.615 / 5.542.
 | 09 | cedc-m09-<leg> (track rotation) | **speed push**: distance reward (15 × % of lap per step), lap bonus ∝ speed², off-track −5; from M08 vegas2-2147; stand-in tracks only | 02:11 → 07:21 (**all on 2024_reinvent_champ_cw**: the track switches failed, see FINDINGS) | laps 20% → ~70%; lap 15.5–15.9 s (M08 2nd round there: 16.0–16.5 s) | not evaluated yet | 14.4 (training) | **10.167** (#21, summit1-0414 ckpt 87, best lap 9.985); 11.286 (#20, champ2-0515 ckpt 94) | stopped M08's slow drift and much more reliable, but not faster than M08's first round on this track |
