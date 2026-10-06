@@ -14,3 +14,5 @@
 | J25 wt2-1023 (lr 0.00005, 1 h) | 1 / 7.80 s | **5 / 10.82 s** |
 
 Mixed (better on the regular 2019 track it now trains on, slightly worse on 2019 wide) → as agreed with Jason: continue from wt2-1023 at **lr 0.0001** (`m25c-jason-*`, 10:35 →), test again after an hour.
+
+**2-hour test (11:46, after 1 h at lr 0.0001; `logs/m25_test2.txt`):** `m25c wt4-1145` reInvent2019_wide **0 off / 6.77 s** (6.47–7.07 s, 5 clean laps), reInvent2019_track **3 off / 10.59 s** — better than J23 bw8-end on both (0 / 7.26, 8 / 12.30). Packaged: `submissions/m25c-jason-wt4-1145-ckpt651.tar.gz`. Continued from it at lr 0.0001 (`m25d-jason-*`, 11:55 →).
