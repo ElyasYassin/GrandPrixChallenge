@@ -8,4 +8,13 @@ Two simulators, reInvent2019_wide + reinvent_base, no DR, lr 0.0001, 45-min legs
 
 ## Results
 
-(pending)
+**Test after leg 1 (14:28, 5 trials, DR off; `logs/m27_test.txt`):**
+
+| Model | reInvent2019_wide off / mean | reinvent_base off / mean |
+|---|---|---|
+| Elyas's m14b-w8-end (portal 6.338) | 3 / 7.70 s | 11 / 9.92 s |
+| **J27 wb1-end** (45 min) | **1 / 7.05 s** | **9 / 9.58 s** |
+
+Better on both after one leg. Packaged `submissions/m27-jason-wb1-end-ckpt388.tar.gz`. Resumed as `m27b-jason-*`.
+
+Side finding: m14b-w8-end leaves reinvent_base 11× in 5 laps locally but ran clean on the portal (6.338 / 6.270), so the secret track is unlikely to be re:Invent 2018-like in its tight corners; A to Z (reInvent2019_wide) fits better.
