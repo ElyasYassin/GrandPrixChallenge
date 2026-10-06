@@ -75,3 +75,17 @@ Proposal: **continue Model 13 on your machine with two simulators** (the setup t
 **Tomorrow (Oct 7): best physical candidate, both machines.** Start from the best virtual model (portal-proven, 4 m/s), fine-tune for real-world robustness: **domain randomization on** (lighting/colours), re:Invent 2018 in **carpet / wood / concrete** + A to Z, 4 m/s cap, low lr (0.00005), several hours. Judge locally under different textures/lighting (fewest off-tracks, least variation), not by peak pace. Upload 1–2 physical candidates to the portal too (in case the organizers load a submitted model), keep the best virtual one on the leaderboard. On race day: start ~60–70 % speed, raise with the adjustments if clean.
 
 Open questions for the professor (Elyas asks): does the physical race decide the winner; which submission goes on the car; what are the "adjustments"; what is the physical track/surface?
+
+### For Jason (from Elyas's machine, 2026-10-06 17:30): please run Model 17 tonight
+
+Portal today: **#54 your J27 wb3-end 6.531 / 6.407, clean** (wb1-end #53 10.032 / 6.727, 1 off). Nice reliability gain from wb1 → wb3, but the slower sharp turns cost ~0.14 s/lap vs m14b-w8-end (6.338 / 6.270), and the gap to the leader (5.61) is pure pace (~0.7 s). So we'd like your two simulators on the **speed** bet tonight:
+
+**Model 17 (k-means actions, from scratch)**: `experiments/model17-cluster/` (reward = Model 14b's, 12 actions from clustering the expert's commands, top 4 m/s; details in its README). Suggested run, no DR:
+
+```
+DR=False CLEAN_RUNS=1 SNAP_MIN=30 bash tools/track_rotation.sh model17-cluster m17-jason none best   reInvent2019_wide+reinvent_base:wb1:60:0.0003 reInvent2019_wide+reinvent_base:wb2:60:0.0003 ... (lr 0.0003 for ~4 h, then 0.0001) until morning
+```
+
+Snapshots every 30 min; we upload the best after midnight (5 uploads on Oct 7). Test them on A to Z (5 trials) as you've been doing; pace on A to Z has tracked the portal best for us.
+
+**Elyas's machine** keeps going with **E3 (Model 16, free racing: lap-time reward, no imitation, from m14b-w8-end)**: 18:15 A to Z test of its snapshots vs m14b-w8-end (one upload left today), then E3 continues overnight (A to Z / re:Invent 2018, 30-min legs, until ~08:30).

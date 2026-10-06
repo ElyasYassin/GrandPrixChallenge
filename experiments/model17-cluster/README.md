@@ -6,7 +6,7 @@
 
 Closed-loop expert (measured car, 5° noise): A to Z 4.82 s (15-action 14b set: 4.78), re:Invent 2018 5.47 s (5.13; 0.3 off-tracks/lap).
 
-**Reward:** Model 14b's (imitation of the pure-pursuit expert on the racing line, braking-aware speeds, grip 9, top 4 m/s, straight bonus / flip penalty, speed-scaled off-track penalty). **From scratch** (new action count): A to Z 60 min, then 30-min phases alternating re:Invent 2018 / A to Z; lr 0.0003 until ~02:30, then 0.0001; queued to start when E3 (Model 16) finishes (~18:20) → ~08:20. Also the base for tomorrow's physical candidate (DR + textured floors, teacher-student idea from "Sim-To-Real Transfer for Miniature Autonomous Car Racing").
+**Reward:** Model 14b's (imitation of the pure-pursuit expert on the racing line, braking-aware speeds, grip 9, top 4 m/s, straight bonus / flip penalty, speed-scaled off-track penalty). **From scratch** (new action count): A to Z 60 min, then 30-min phases alternating re:Invent 2018 / A to Z; lr 0.0003 until ~02:30, then 0.0001; **moved to Jason's machine (two simulators) on 2026-10-06 17:30**; Elyas's machine continues E3. Also the base for tomorrow's physical candidate (DR + textured floors, teacher-student idea from "Sim-To-Real Transfer for Miniature Autonomous Car Racing").
 
 ## Results
 
