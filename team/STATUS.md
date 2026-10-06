@@ -6,13 +6,13 @@ Edit only your own section. Times are local (Mountain Time).
 
 ## Elyas: RTX 3090 / Ryzen 5 5600X (DRfC in WSL2)
 
-**Updated:** 2026-10-05 12:45
+**Updated:** 2026-10-06 11:50
 
 | | |
 |---|---|
 | Training now | **Model 13c screening loop** from Model 13 `w4-end` (portal best lap 6.333): speed-scaled off-track penalty, hourly train + screen on reInvent2019_wide, clean snapshots packaged; since 12:47 |
 | Last run | Model 07 (off-track penalty + edge safety): no clear gain over M05 snap2 in 5 trials × 6 tracks |
-| Best on portal | **7.130** (#33, `cedc-m10v-c2-end`). Since: J17 wv1-end 7.389 / 6.800, M11c v1-end 7.457, Model 13 w4-end 19.206 but **best lap 6.333** |
+| Best on portal | **Model 14b w8-end (ckpt 357): 6.338**, best lap 6.270, clean (#51). Jason J23 bw8-end 6.989 (#50). Leader 5.615 |
 | Next | **Goal set by Elyas: beat the leader (5.615) on Oct 5–6.** Both machines on Model 13 (only line faster than 6.7 s/lap); upload many snapshots |
 | Machine notes | 1 simulator only (CPU); simulator leaks memory with GPU rendering → `tools/supervise.sh` restarts it at iteration boundaries |
 
