@@ -13,6 +13,10 @@ TRAIN_DR=True PAIRS_SPEC="reInvent2019_wide+reinvent_carpet:wk reinvent_base+rei
 
 ## Results
 
-(pending)
+**J21 (DR + textures), 13:49 → 17:58, 3 blocks screened** (`logs/m21-jason_screen.txt`, 5 trials on reInvent2019_wide, DR off): best snapshots bo1-1435 1 off / 7.72 s, bk2-1546 2 off / 7.61 s (best lap 6.28), wo3-1625 1 off / 7.79 s; no 0-off snapshot, so nothing auto-packaged (bo1-1435 packaged by hand).
+
+Training completion was poor with DR + textures: reInvent2019_wide 54 % progress / 20 % laps finished, reinvent_base 32 % / 3 %, carpet & wood 23 % / 0–1 %, rI2024 20 % (J17 without DR: wide 74–76 %, base 52 %). As in J18, the fast 7.130 line does not adapt to textured floors; DR also costs completion on the plain tracks.
+
+**→ J21b (17:58, Jason: "the completion is horrible"):** same reward (M10 + speed-scaled penalty) and screening, **DR off, plain short tracks only** (wide + base, + rI2024 / Vegas), from `cedc-m21-jason-bt3-end`, 6 blocks; `logs/m21b-jason_screen.txt`.
 
 Note: J18 (7.130 line + carpet/wood, no DR, flat penalty) did not learn the textured floors in 4 h; J21 adds DR (as in J13, which did) and the speed-scaled penalty.
