@@ -18,3 +18,5 @@ Two simulators, reInvent2019_wide + reinvent_base, no DR, lr 0.0001, 45-min legs
 Better on both after one leg. Packaged `submissions/m27-jason-wb1-end-ckpt388.tar.gz`. Resumed as `m27b-jason-*`.
 
 Side finding: m14b-w8-end leaves reinvent_base 11× in 5 laps locally but ran clean on the portal (6.338 / 6.270), so the secret track is unlikely to be re:Invent 2018-like in its tight corners; A to Z (reInvent2019_wide) fits better.
+
+**Test 2 (16:11, 5 trials, DR off; `logs/m27_test2.txt`):** wb2-end A to Z 4 off / 7.32 s, re:Invent 2018 12 / 10.27 s (a dip); **wb3-end A to Z 1 off / 6.63 s (best lap 5.93 s), re:Invent 2018 8 / 9.48 s** — best so far, ~1 s/lap faster on A to Z than m14b-w8-end. Packaged `submissions/m27b-jason-wb3-end-ckpt447.tar.gz`. Resumed from it as `m27c-jason-*`.
