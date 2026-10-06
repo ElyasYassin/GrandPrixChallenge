@@ -6,4 +6,11 @@
 
 ## Results
 
-(pending)
+**1-hour test (10:25, 5 trials, DR off; `logs/m25_test.txt`):**
+
+| Model | reInvent2019_wide off / mean | reInvent2019_track off / mean |
+|---|---|---|
+| J23 bw8-end (start) | **0 / 7.26 s** | 8 / 12.30 s |
+| J25 wt2-1023 (lr 0.00005, 1 h) | 1 / 7.80 s | **5 / 10.82 s** |
+
+Mixed (better on the regular 2019 track it now trains on, slightly worse on 2019 wide) → as agreed with Jason: continue from wt2-1023 at **lr 0.0001** (`m25c-jason-*`, 10:35 →), test again after an hour.
