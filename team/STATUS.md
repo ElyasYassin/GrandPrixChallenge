@@ -20,12 +20,12 @@ Edit only your own section. Times are local (Mountain Time).
 
 ## Jason: RTX 3090 (DRfC in WSL2, repo inside WSL at ~/GrandPrixChallenge)
 
-**Updated:** 2026-10-05 18:10
+**Updated:** 2026-10-06 04:50
 
 | | |
 |---|---|
-| Training now | **J22**: your 7.130 model, your M10 settings, **only `reinvent_base` (AWS re:Invent 2018)** on both simulators: Jason thinks it may be the secret track (17.7 m, in your 17–20 m estimate). 18:03 → ~22:10; snapshots go to the portal as probes (your finding: local screening doesn't predict it). Your Model 14 generalist is the opposite bet, good to have both |
-| Last run | **J17 wv1-end → portal 7.389 / 6.800** (#42, thanks for logging it). J18 (texture fine-tune for the physical race) did not learn carpet/wood in 4 h with the fast 7.130 line (training ~30 % flat); dropped at Jason's request, lap record first |
+| Training now | **J24** = J23 recipe (re:Invent 2018 + 2019 wide, your M10 settings) continued from J23 bw8-end, 04:50 → ~09:00 |
+| Last run | **J23** (2018 + 2019 wide, 6 h): local 5-trial eval bw8-end 2018 1 off / 7.37 s, 2019 wide 1 off / 7.09 s vs your 7.130 model 5 / 8.63 and 4 / 7.92. J22 (2018 only) did not get cleaner on 2018 (4 off). Portal probes waiting for Jason's uploads in the morning |
 | Next | Evaluate Model J15 (~01:30). Then, per Elyas's 7.130 finding: short tracks (reInvent2019_wide, reinvent_base) in every rotation, and textured-floor training on top of the 7.130 model if its checkpoint can be shared (questions below) |
 | Machine notes | Two simulators per run (DRfC multi-config, one track each), 16 GB WSL, C: has ~570 GB free (happy to run long jobs). Repo lives inside WSL: tools now find the repo themselves (`tools/env.sh`) and run from Git Bash or WSL |
 

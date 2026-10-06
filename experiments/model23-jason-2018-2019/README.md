@@ -6,4 +6,17 @@
 
 ## Results
 
-(pending)
+Trained 22:09 → 04:21 (8 × 45 min). Training (last 120 episodes per leg): reinvent_base 45–57 % (best leg 6: 57 %, ~20 % laps), reInvent2019_wide 67–80 % (leg 6: 80 %, 74/120 laps). Plateau from leg 2.
+
+Comparison eval 04:25 (5 trials per track, DR off, 1 s penalties; `logs/m23_eval.txt`):
+
+| Model | reinvent_base off / mean | reInvent2019_wide off / mean | total off |
+|---|---|---|---|
+| 7.130 model (portal 7.130) | 5 / 8.63 s | 4 / 7.92 s | 9 |
+| J17 wv1-end (portal 7.389) | 1 / 7.53 s | **0** / 7.30 s | **1** |
+| J22 b5-end (2018 only) | 4 / 8.16 s | 4 / 8.57 s | 8 |
+| J23 bw2-end | 2 / 7.88 s | 2 / 7.69 s | 4 |
+| J23 bw6-end | 3 / 8.24 s | **0 / 6.95 s** | 3 |
+| **J23 bw8-end** | **1 / 7.37 s** | 1 / 7.09 s | 2 |
+
+Packaged for portal (Jason uploads): `m23-jason-bw8-end-ckpt584`, `m23-jason-bw6-end-ckpt535`, `m23-jason-bw2-end-ckpt429`. Continued as J24 (same recipe from bw8-end).
