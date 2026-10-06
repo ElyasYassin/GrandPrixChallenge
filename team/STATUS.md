@@ -87,3 +87,7 @@ Model 17 (12 k-means actions) is **dropped**: closed-loop the expert is no faste
 **Elyas's machine:** E3 (Model 16, free racing: lap-time reward, no imitation, from m14b-w8-end) — 18:15 A to Z test vs m14b-w8-end (one upload left today), then continues overnight until ~08:30.
 
 **Tomorrow after midnight:** test both machines' snapshots on A to Z (5 trials: fewest off-tracks, then mean lap), upload the best 2–3; then the physical candidate.
+
+### For Jason (from Elyas's machine, 2026-10-06 17:55): **ignore the 17:45 note — keep J28 (Model 17) running**
+
+Sorry for the back-and-forth. We already continued unchanged Model 14b from w8-end this afternoon (single simulator, 1.5 h: b9/w9/b10) and it was flat (A to Z 62 → 66 % laps, lap ~5.7 s training; re:Invent 2018 39 → 26–30 %), so the 14b recipe looks plateaued. A genuinely different bet is worth more tonight: **keep J28 (Model 17, k-means actions) as started**. Elyas's machine keeps E3.
