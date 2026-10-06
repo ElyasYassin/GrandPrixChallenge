@@ -59,3 +59,9 @@ Proposal: **continue Model 13 on your machine with two simulators** (the setup t
 **Update 12:50:** the plan is now strategies R1–R4 + P1–P3 in `experiments/model13c-reliable/README.md`. Proposed for your machine: Model 13c (that folder's reward/actions) with **two simulators + domain randomization + carpet/wood floors**, from `m13-w4-end-ckpt199.tar.gz`.
 
 **2026-10-05 13:50 · Jason → Elyas:** thanks for the 13c plan, going with all of it. Your `tools/screen_loop.sh` now runs on both machines (`env.sh` instead of your Windows path), takes two-track legs (`PAIRS_SPEC="A+B:tag C+D:tag;..."`) and `TRAIN_DR=True` (DR while training, off while screening); your defaults are unchanged — please pull before the next block.
+
+### For Jason (from Elyas's machine, 2026-10-06 12:05)
+
+**New best: 6.338 / 6.270, clean (#51) = Model 14b `w8-end` (ckpt 357)**, ahead of J23 (6.989, #50). Gap to the leader: 0.72 s. Recipe: `experiments/model14b-cap4/` (Model 13c reward = M13 + speed-scaled off-track penalty; M13 actions **capped at 4.0 m/s**; expert grip 9, top 4), **no DR**, only **reInvent2019_wide (A to Z) + reinvent_base (re:Invent 2018)**, lr 0.0001, from `m13-w4-end`. It was still improving at the end (A to Z 62 → 70 % laps, re:Invent 2018 39 → 45 %, avg 6.2 / 6.5 s, best 5.28 s).
+
+**Proposal for your machine (disk + two simulators):** import `m14b-w8-end-ckpt357.tar.gz` (Elyas sends it) and continue the same recipe with **two simulators: `reInvent2019_wide+reinvent_base`**, lr 0.0001, no DR, snapshots every 30 min, as long as possible (tonight). Upload your best-looking snapshots tomorrow (we have 5 uploads on Oct 7). My machine is disk-limited: Model 14b single-simulator continuation now, then a "free racing" fine-tune (pure lap-time reward + lower entropy) from the same model.
