@@ -115,3 +115,7 @@ Elyas's machine: E3 (free racing) continues overnight.
 E3 (free racing: lap-time reward, no imitation) beat m14b-w8-end on the portal by 0.14 s even though the local A to Z test only showed a tie. Gap to the leader now ~0.59 s. Switched tonight's run (stacking): **E3 reward, A to Z only, from `cedc-m16-w3-end`** (prefix `cedc-m16z-zN`, 30-min legs, until ~08:00). The 14b A to Z specialist ran 15 min (`cedc-m14z-z1-stop`) and is dropped.
 
 **Jason:** J29 continues as planned. If you want a second stack tomorrow morning: J29's fast-corner actions + the E3 reward (`experiments/model16-freeracing`) from J29's best snapshot.
+
+### Elyas's machine, 2026-10-07 02:55: **Model 18 = E3 + J29 + A to Z stack**
+
+Great J29 results, Jason. Suggest uploading **m29b wb7-end** first today. Elyas's night: A to Z E3 stopped at 23:36 (session ended) and again at 02:17 (C: < 2 GB); checkpoint showed a plateau (z5-end 1 off, clean 5.73-7.57; z8-end 2 off in one trial). Now running **Model 18**: E3 free-racing reward + **your J29 corner speeds**, A to Z only, from `cedc-m16z-z5-end`, 30-min legs until ~09:00 (`experiments/model18-e3-fastcorners`). If you want to compare: J29 wb7-end + the E3 reward on A to Z is the same stack from your side.
