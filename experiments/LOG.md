@@ -50,6 +50,7 @@ One row per trained model. Change **one idea** per model.
 | 53 | 2026-10-06 17:15 | Jason J27 wb1-end ckpt 388 (14b + sharp turns 30° 2.2 / 20° 2.7 m/s, 45 min; locally 1 off / 7.05 s on A to Z vs w8-end 3 / 7.70) | 100% | 10.032 | 6.727 |
 | 54 | 2026-10-06 17:20 | Jason J27 wb3-end ckpt 447 (same, 2 h 15 min; locally 1 off / 6.63 s on A to Z) | 100% | 6.531 | 6.407 |
 | 57 | 2026-10-06 19:14 | **E3 (Model 16 free racing) w3-end ckpt 400** (lap-time reward, no imitation, from m14b-w8-end, 3 h; A to Z test 1 off / 6.81 s mean vs w8-end 0 / 6.88) | 100% | **6.197** | **6.144** |
+| 67 | 2026-10-07 09:38 | Jason J29 wb16-end ckpt 887 (Model 14b + faster corners 30° 2.8 / 20° 3.2 / 12° 3.4, two simulators, ~15 h; A to Z test 1 off / 5.85 s, laps to 5.01) | 100% | 9.044 (1 off-track) | **5.664** |
 
 Leader (2026-09-30): Shallow Learner, 100%, 5.615 / 5.542.
 | 09 | cedc-m09-<leg> (track rotation) | **speed push**: distance reward (15 × % of lap per step), lap bonus ∝ speed², off-track −5; from M08 vegas2-2147; stand-in tracks only | 02:11 → 07:21 (**all on 2024_reinvent_champ_cw**: the track switches failed, see FINDINGS) | laps 20% → ~70%; lap 15.5–15.9 s (M08 2nd round there: 16.0–16.5 s) | not evaluated yet | 14.4 (training) | **10.167** (#21, summit1-0414 ckpt 87, best lap 9.985); 11.286 (#20, champ2-0515 ckpt 94) | stopped M08's slow drift and much more reliable, but not faster than M08's first round on this track |
