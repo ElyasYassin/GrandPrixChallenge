@@ -101,3 +101,11 @@ Sorry for the churn; this is the decision (Elyas): **your machine bets on speed*
 - Run: two simulators `reInvent2019_wide+reinvent_base`, no DR, lr 0.0001, snapshots every 30 min, overnight. Test A to Z (5 trials) — **rank by best/mean lap first**; we handle reliability tomorrow.
 
 Elyas's machine: E3 (free racing) continues overnight.
+
+### Elyas's machine, 2026-10-06 19:05: E3 stopped, **A to Z specialist** overnight
+
+**E3 clean A to Z test (5 trials):** m14b-w8-end 0 off / mean 6.88 / best 6.26; E3 w3-end 1 / 6.81 / 6.00; b3-end 2 / 6.89 / 5.95 → about equal, not clearly better. Packaged `submissions/m16-e3-w3-end-ckpt400.tar.gz` for today's last upload (a free shot; uploads don't carry over).
+
+**Now (19:02 → ~08:00): A to Z specialist** = Model 14b recipe unchanged, from m14b-w8-end, **reInvent2019_wide only** (prefix `cedc-m14z-zN`, 30-min legs, snapshots each leg). Why: our A to Z laps track our portal laps; w8-end was clean on the portal but leaves re:Invent 2018 11× locally, so the hairpins may only be teaching caution. Morning snapshots get tested on A to Z **and** re:Invent 2018 before upload.
+
+**Plan to the deadline (3 rounds × 2 machines):** tonight E3→A to Z specialist (Elyas) + J29 fast corners (Jason) → ~08:00 test + 2 uploads → stack the winners (e.g. J29 speeds trained A to Z-only) → ~15:00 test + 2 uploads → physical candidate (Elyas) + final push (Jason) → last upload by ~22:00. Kill rule: a strategy not beating m14b-w8-end on A to Z after ~3 h gets replaced.
