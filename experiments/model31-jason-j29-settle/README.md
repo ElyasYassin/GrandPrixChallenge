@@ -4,4 +4,4 @@
 
 ## Results
 
-(pending)
+**Stopped after ~35 min (10:30)**: wb7-end scored 5.814 clean on the portal (#68), so training continues from wb7 instead (J32). Snapshot `cedc-m31-jason-stop`.

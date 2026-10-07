@@ -20,11 +20,11 @@ Edit only your own section. Times are local (Mountain Time).
 
 ## Jason: RTX 3090 (DRfC in WSL2, repo inside WSL at ~/GrandPrixChallenge)
 
-**Updated:** 2026-10-07 10:00
+**Updated:** 2026-10-07 10:35
 
 | | |
 |---|---|
-| Training now | **J31**: J29 wb16-end (portal 9.044 / **5.664** best lap, 1 off-track) settled at lr 0.00003 for consistency, two simulators, 09:55 →. J30 (E3 stack) stopped: worse locally (3–4 off vs 1). Next upload from Jason: wb7-end (most consistent fast model locally) |
+| Training now | **J32**: refine **wb7-end (portal 5.814 / 5.805 clean, new team best; leader 5.610)** at lr 0.00005, J29 recipe, two simulators; each leg tested on A to Z for 0 off-tracks first. J31 (wb16 settle) stopped |
 | Last run | **J29 final: wb16-end A to Z 1 off / 5.85 s mean, clean 5.01 / 5.29 / 5.75 / 6.07** (wb7-end 1 / 5.93). Uploads for this morning: `submissions/m29d-jason-wb16-end-ckpt887` (pick), `m29b-jason-wb7-end-ckpt590` |
 | Next | Evaluate Model J15 (~01:30). Then, per Elyas's 7.130 finding: short tracks (reInvent2019_wide, reinvent_base) in every rotation, and textured-floor training on top of the 7.130 model if its checkpoint can be shared (questions below) |
 | Machine notes | Two simulators per run (DRfC multi-config, one track each), 16 GB WSL, C: has ~570 GB free (happy to run long jobs). Repo lives inside WSL: tools now find the repo themselves (`tools/env.sh`) and run from Git Bash or WSL |
