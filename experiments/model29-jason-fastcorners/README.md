@@ -51,3 +51,5 @@ Training (A to Z median training lap 5.8–6.1 s vs ~6.7 for J27; re:Invent 2018
 wb7-end: 4 of 5 laps clean at 5.56–5.82 s (leader's portal score 5.615). Packaged: `m29b-jason-wb7-end-ckpt590` (pick), `m29b-jason-wb4-end-ckpt495` (fastest lap). Resumed as `m29c-jason-*`.
 
 **Test 3 (03:00, A to Z 5 trials, DR off; `logs/m29_test3.txt`):** wb8-end 6 off / 7.30 (best 5.29), wb9-end 8 / 7.80, **wb10-end 2 / 6.42, clean 5.29, 5.62, 5.74, 5.82**, wb11-end 3 / 6.62. wb7-end (1 off / 5.93) stays the pick; wb10-end packaged as the second (`m29c-jason-wb10-end`). Snapshots swing a lot leg to leg (1–8 off-tracks), so pick by test, not by recency. Resumed as `m29d-jason-*` (legs 12–16, until ~07:00).
+
+**Test 4 (07:05, final legs; `logs/m29_test4.txt`):** wb12-end 3 off / 6.48, wb13-end 7 / 7.80, wb14-end 3 / 6.71 (best 5.16), wb15-end 2 / 6.48, **wb16-end 1 off / 5.85 s mean, clean 5.01 / 5.29 / 5.75 / 6.07** — the new pick (fastest lap of any model so far). Packaged `submissions/m29d-jason-wb16-end-ckpt887.tar.gz`. Continued as J30 (E3 reward stack, A to Z only).
