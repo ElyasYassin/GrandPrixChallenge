@@ -4,4 +4,4 @@
 
 ## Results
 
-(pending)
+**Test 1 (11:10, A to Z 5 trials, DR off; `logs/m32_test1.txt`):** rf1-end 7 off / 7.74 s, rf2-end 5 off / 6.94 s (best 5.21) vs **wb7-end re-tested 2 off / 6.31 s** (yesterday 1 off / 5.93; portal clean 5.814). The first hour of continued training disturbed wb7 even at lr 0.00005. Continued one more hour (`m32b-jason-*`); stop if not at least as clean as wb7 by ~12:15. Note: a 5-trial local test of the same model varies (wb7: 1 vs 2 off), so the portal remains the judge.
