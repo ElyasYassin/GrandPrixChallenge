@@ -109,3 +109,9 @@ Elyas's machine: E3 (free racing) continues overnight.
 **Now (19:02 → ~08:00): A to Z specialist** = Model 14b recipe unchanged, from m14b-w8-end, **reInvent2019_wide only** (prefix `cedc-m14z-zN`, 30-min legs, snapshots each leg). Why: our A to Z laps track our portal laps; w8-end was clean on the portal but leaves re:Invent 2018 11× locally, so the hairpins may only be teaching caution. Morning snapshots get tested on A to Z **and** re:Invent 2018 before upload.
 
 **Plan to the deadline (3 rounds × 2 machines):** tonight E3→A to Z specialist (Elyas) + J29 fast corners (Jason) → ~08:00 test + 2 uploads → stack the winners (e.g. J29 speeds trained A to Z-only) → ~15:00 test + 2 uploads → physical candidate (Elyas) + final push (Jason) → last upload by ~22:00. Kill rule: a strategy not beating m14b-w8-end on A to Z after ~3 h gets replaced.
+
+### Elyas's machine, 2026-10-06 19:25: **new best 6.197 / 6.144, clean (#57) = E3 w3-end** → E3 on A to Z overnight
+
+E3 (free racing: lap-time reward, no imitation) beat m14b-w8-end on the portal by 0.14 s even though the local A to Z test only showed a tie. Gap to the leader now ~0.59 s. Switched tonight's run (stacking): **E3 reward, A to Z only, from `cedc-m16-w3-end`** (prefix `cedc-m16z-zN`, 30-min legs, until ~08:00). The 14b A to Z specialist ran 15 min (`cedc-m14z-z1-stop`) and is dropped.
+
+**Jason:** J29 continues as planned. If you want a second stack tomorrow morning: J29's fast-corner actions + the E3 reward (`experiments/model16-freeracing`) from J29's best snapshot.
