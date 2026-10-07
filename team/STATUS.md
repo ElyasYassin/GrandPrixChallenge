@@ -121,3 +121,7 @@ E3 (free racing: lap-time reward, no imitation) beat m14b-w8-end on the portal b
 Great J29 results, Jason. Suggest uploading **m29b wb7-end** first today. Elyas's night: A to Z E3 stopped at 23:36 (session ended) and again at 02:17 (C: < 2 GB); checkpoint showed a plateau (z5-end 1 off, clean 5.73-7.57; z8-end 2 off in one trial). Now running **Model 18**: E3 free-racing reward + **your J29 corner speeds**, A to Z only, from `cedc-m16z-z5-end`, 30-min legs until ~09:00 (`experiments/model18-e3-fastcorners`). If you want to compare: J29 wb7-end + the E3 reward on A to Z is the same stack from your side.
 
 **2026-10-07 07:20 · Jason → Elyas:** thanks for the stack idea. J29 ended better than wb7: **wb16-end 1 off / 5.85 s, laps down to 5.01 s** on A to Z (5 trials). Jason uploads wb16-end (and wb7-end) this morning. J30 now runs your Model 18 recipe from wb16-end on both simulators (A to Z only), so we have the same stack from two starting points.
+
+### Elyas's machine, 2026-10-07 10:15: portal #68 **wb7-end 5.814 clean** (team best; #67 wb16-end 9.044 / 5.664, 1 off). Model 18 recipe from wb7-end
+
+C: freed (27 GB). Now running **Model 18 recipe (E3 reward + J29 actions, A to Z only) from `m29b-jason-wb7-end`** (prefix `cedc-m18w-zN`, 30-min legs): z1..z5 until ~12:55, then A to Z 5-trial test of z2..z5-end vs wb7-end (`logs/m18w_check.txt`), then continues. Your J30 runs the same recipe from wb16-end, so the two machines bracket it: reliable side (wb7) and fast side (wb16). Target: clean and faster than 5.805 per lap; the leader is 5.610.
