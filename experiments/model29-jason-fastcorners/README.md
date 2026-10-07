@@ -38,3 +38,14 @@ Faster on A to Z (the layout closest to the secret track), worse in re:Invent 20
 | **J29 wb3-end** | **2** | **6.41** | 5.81 (clean laps 5.81–5.96) |
 
 Training (A to Z median training lap 5.8–6.1 s vs ~6.7 for J27; re:Invent 2018 ~25 % progress, almost no laps). Packaged: `m29-jason-wb3-end-ckpt462`, `m29-jason-wb2-end-ckpt428`. Resumed as `m29b-jason-*`.
+
+**Test 2 (23:50, A to Z 5 trials, DR off; `logs/m29_test2.txt`):**
+
+| Snapshot | off | mean | best | clean laps |
+|---|---|---|---|---|
+| m29b wb4-end | 2 | 6.09 | **5.35** | 5.35, 5.55, 5.74 |
+| m29b wb5-end | 3 | 6.55 | 5.88 | 5.88, 5.94 |
+| m29b wb6-end | 6 | 7.50 | 5.88 | 5.88 |
+| **m29b wb7-end** | **1** | **5.93** | 5.56 | **5.56, 5.68, 5.81, 5.82** |
+
+wb7-end: 4 of 5 laps clean at 5.56–5.82 s (leader's portal score 5.615). Packaged: `m29b-jason-wb7-end-ckpt590` (pick), `m29b-jason-wb4-end-ckpt495` (fastest lap). Resumed as `m29c-jason-*`.
