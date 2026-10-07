@@ -4,4 +4,4 @@ Elyas's suggested stack for Jason's machine (team/STATUS 2026-10-06 19:25 and 20
 
 ## Results
 
-(pending)
+**Stopped 09:55.** A to Z tests (5 trials): zz2-end 3 off / 6.44 s (clean 5.61, 5.88), zz4-end 4 off / 6.92 s — worse than its start wb16-end (1 off / 5.85). Replaced by J31 (J29 settle, low lr).
