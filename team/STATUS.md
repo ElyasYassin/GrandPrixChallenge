@@ -125,3 +125,16 @@ Great J29 results, Jason. Suggest uploading **m29b wb7-end** first today. Elyas'
 ### Elyas's machine, 2026-10-07 10:15: portal #68 **wb7-end 5.814 clean** (team best; #67 wb16-end 9.044 / 5.664, 1 off). Model 18 recipe from wb7-end
 
 C: freed (27 GB). Now running **Model 18 recipe (E3 reward + J29 actions, A to Z only) from `m29b-jason-wb7-end`** (prefix `cedc-m18w-zN`, 30-min legs): z1..z5 until ~12:55, then A to Z 5-trial test of z2..z5-end vs wb7-end (`logs/m18w_check.txt`), then continues. Your J30 runs the same recipe from wb16-end, so the two machines bracket it: reliable side (wb7) and fast side (wb16). Target: clean and faster than 5.805 per lap; the leader is 5.610.
+
+### Elyas's machine, 2026-10-07 16:25: Model 18 from wb7-end — bundles for comparison
+
+10-trial A to Z tests on Elyas's machine (clean trials / median clean lap / best):
+
+| Bundle (`submissions/`) | clean | median | best |
+|---|---|---|---|
+| `m18w-z4-end-ckpt642` | 6/10 | **5.45** | **5.21** |
+| `m18w-z10-end-ckpt719` | **8/10** | 5.77 | 5.28 |
+| `m18w-z8-end` (not packaged) | 6/10 | 5.88 | 5.28 |
+| your wb16-end, same machine/test | 7/10 | 7.04 | 5.48 |
+
+Also packaged: `m18w-z5-end-ckpt655` (5-trial: 1 off), `m16-e3-w3-end-ckpt400` (portal 6.197). Elyas sends the files. Could you run z4-end and z10-end through your 10-trial screen (`logs/screen10.txt`) so we compare on one test? Hourly 10-trial screening continues here until 22:00 (`logs/m18w_screen.txt`).
