@@ -27,3 +27,7 @@ Going closer to the edges also moves every apex outward and the expert leaves th
 | J34 sz2-end (1 h) | 7/10 | 6.34 | 5.74 | 5.42 |
 
 The straighter S-line made wb7 both steadier and faster. Packaged `submissions/m34-jason-sz1-end` (upload candidate: P(3 clean trials) ≈ 0.5, clean laps ≈ leader pace).
+
+**Narrow-track check (19:19, reinvent_base 5 trials; `logs/narrow_test.txt`):** sz1-end 5 off (one per lap, 7.2–7.3 s), wb7-end 10 off, wb16-end 18 off: no sign that 30 min of A to Z-only training specialised sz1.
+
+**21:05: switched to both tracks.** Elyas's Model 21 (wb7 + A to Z only, ~8 h; locally 7/10 clean, median 5.42) scored **12.472 / 11.877** on the portal (#75): A to Z-only training overfits. J34 continues from sz1-end on **A to Z + re:Invent 2018** (`m34d-jason-*`), lr 0.00005. Later A to Z-only snapshots (sz2–sz6) are not upload candidates.
