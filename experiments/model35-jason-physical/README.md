@@ -15,3 +15,18 @@ Baseline wb7-end (5 trials, DR off): reinvent_carpet **16 off / 5 laps**, mean 1
 **Test 2 (02:15, lr 0.00005 since 00:09; `logs/m35_test2.txt`):** ca6-end carpet 8 off / 8.42 s (concrete 50 off — an outlier run), **ca8-end carpet 8 off / 8.40 s (first clean carpet laps), A to Z 3/5 clean / 6.14 s, concrete (held out) 15 off / 10.20 s** (wb7: 29 / 14.0). Packaged `submissions/m35d-jason-ca8-end` as the current physical candidate.
 
 **Test 3 (04:30; `logs/m35_test3.txt`):** **ca10-end carpet 7 off / 8.92 s, A to Z 5/5 clean / 6.06 s, concrete 16 off / 10.06 s** → physical pick (packaged). ca12-end carpet 11 / 9.62, **A to Z 5/5 clean / 5.66 s** (best A to Z result we have), concrete 24 / 13.71 → packaged as a possible portal probe (caveat: local A to Z misled us for J34 / Model 21, but J35 trains on two tracks with DR).
+
+**Test 4 (07:00; `logs/m35_test4.txt`):** ca14-end carpet 8 off / 8.61 s, A to Z 4/5, concrete 15 / 10.35; ca16-end carpet 7 / **8.14 s** (fastest on carpet), A to Z 4/5, concrete 21 / 12.28. Carpet off-tracks have levelled off at ~7–8 per 5 laps since ca8.
+
+**Summary for race day (2026-10-08 07:05):**
+
+| Snapshot | carpet off / mean | concrete (held out) | A to Z clean / mean |
+|---|---|---|---|
+| wb7-end (start) | 16 / 11.10 | 29 / 14.0 | — |
+| ca8-end | 8 / 8.40 | 15 / 10.20 | 3/5 / 6.14 |
+| **ca10-end (pick)** | **7 / 8.92** | 16 / 10.06 | **5/5 / 6.06** |
+| ca12-end | 11 / 9.62 | 24 / 13.71 | 5/5 / 5.66 |
+| ca14-end | 8 / 8.61 | 15 / 10.35 | 4/5 / 5.95 |
+| ca16-end | 7 / **8.14** | 21 / 12.28 | 4/5 / 6.30 |
+
+Pick **ca10-end** (`submissions/m35e-jason-ca10-end-ckpt851.tar.gz`): half wb7's carpet off-tracks, held-out concrete roughly halved too, still 5/5 clean on A to Z. Alternative: ca16-end (fastest on carpet, less steady elsewhere). On the real car, start slow (Elyas: ~60–70 % speed) and raise it if it stays on track.

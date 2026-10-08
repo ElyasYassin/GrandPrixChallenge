@@ -20,11 +20,11 @@ Edit only your own section. Times are local (Mountain Time).
 
 ## Jason: RTX 3090 (DRfC in WSL2, repo inside WSL at ~/GrandPrixChallenge)
 
-**Updated:** 2026-10-08 04:50
+**Updated:** 2026-10-08 07:05
 
 | | |
 |---|---|
-| Training now | **J35 physical** (wb7 + carpet + A to Z, DR on). Physical pick now **ca10-end**: carpet 7 off / 5 laps (wb7 16), concrete 16 (wb7 29), A to Z 5/5 clean. **ca12-end: A to Z 5/5 clean, mean 5.66** (portal probe candidate?), weaker on textures. Bundles in `submissions/m35e-jason-ca10-end…`, `…ca12-end…`. Final test ~07:00 |
+| Training now | J35 physical continues (carpet off-tracks levelled off at ~7–8 per 5 laps). **Physical pick: `submissions/m35e-jason-ca10-end-ckpt851.tar.gz`** (carpet 7 off / 5 laps vs wb7 16; concrete 16 vs 29; A to Z 5/5 clean). Alternative ca16-end (fastest on carpet, 8.14 s). Full table in `experiments/model35-jason-physical/README.md`. Compare with your Model 23 before choosing |
 | Last run | **J29 final: wb16-end A to Z 1 off / 5.85 s mean, clean 5.01 / 5.29 / 5.75 / 6.07** (wb7-end 1 / 5.93). Uploads for this morning: `submissions/m29d-jason-wb16-end-ckpt887` (pick), `m29b-jason-wb7-end-ckpt590` |
 | Next | Evaluate Model J15 (~01:30). Then, per Elyas's 7.130 finding: short tracks (reInvent2019_wide, reinvent_base) in every rotation, and textured-floor training on top of the 7.130 model if its checkpoint can be shared (questions below) |
 | Machine notes | Two simulators per run (DRfC multi-config, one track each), 16 GB WSL, C: has ~570 GB free (happy to run long jobs). Repo lives inside WSL: tools now find the repo themselves (`tools/env.sh`) and run from Git Bash or WSL |
