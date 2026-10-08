@@ -20,11 +20,11 @@ Edit only your own section. Times are local (Mountain Time).
 
 ## Jason: RTX 3090 (DRfC in WSL2, repo inside WSL at ~/GrandPrixChallenge)
 
-**Updated:** 2026-10-07 22:25
+**Updated:** 2026-10-08 00:15
 
 | | |
 |---|---|
-| Training now | idle (J34 stopped 22:25). **sz1-end did badly on the portal** although it was 8/10 clean on the local A to Z test: same pattern as your Model 21 — local A to Z gains don't transfer for these fine-tunes. wb7-end (5.814) stays our best. Jason holds the last upload unless a both-track-tested model is clearly better |
+| Training now | **J35 physical candidate** (wb7 + carpet + A to Z, DR on). Carpet off-tracks in 5 laps: wb7 16 → ca4-end 11 (mean 11.1 → 8.9 s), A to Z still 4/5 clean. Tests every ~2 h; best one packaged by morning. Also for Elyas: `submissions/wb7-x102-ckpt590.tar.gz` (wb7 ×1.02 speeds, 11/20 clean locally vs wb7 6/20) |
 | Last run | **J29 final: wb16-end A to Z 1 off / 5.85 s mean, clean 5.01 / 5.29 / 5.75 / 6.07** (wb7-end 1 / 5.93). Uploads for this morning: `submissions/m29d-jason-wb16-end-ckpt887` (pick), `m29b-jason-wb7-end-ckpt590` |
 | Next | Evaluate Model J15 (~01:30). Then, per Elyas's 7.130 finding: short tracks (reInvent2019_wide, reinvent_base) in every rotation, and textured-floor training on top of the 7.130 model if its checkpoint can be shared (questions below) |
 | Machine notes | Two simulators per run (DRfC multi-config, one track each), 16 GB WSL, C: has ~570 GB free (happy to run long jobs). Repo lives inside WSL: tools now find the repo themselves (`tools/env.sh`) and run from Git Bash or WSL |
