@@ -18,4 +18,12 @@ Going closer to the edges also moves every apex outward and the expert leaves th
 
 ## Results
 
-(pending)
+**Test 1 (18:55, A to Z 10 trials, DR off; `logs/m34_test1.txt`):**
+
+| Model | clean laps | mean | clean median | best clean |
+|---|---|---|---|---|
+| wb7-end (portal 5.814) | 4/10 | 6.96 | 5.84 | 5.28 |
+| **J34 sz1-end** (30 min) | **8/10** | **5.93** | **5.62** | 5.34 |
+| J34 sz2-end (1 h) | 7/10 | 6.34 | 5.74 | 5.42 |
+
+The straighter S-line made wb7 both steadier and faster. Packaged `submissions/m34-jason-sz1-end` (upload candidate: P(3 clean trials) ≈ 0.5, clean laps ≈ leader pace).
