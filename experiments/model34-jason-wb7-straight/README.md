@@ -31,3 +31,7 @@ The straighter S-line made wb7 both steadier and faster. Packaged `submissions/m
 **Narrow-track check (19:19, reinvent_base 5 trials; `logs/narrow_test.txt`):** sz1-end 5 off (one per lap, 7.2–7.3 s), wb7-end 10 off, wb16-end 18 off: no sign that 30 min of A to Z-only training specialised sz1.
 
 **21:05: switched to both tracks.** Elyas's Model 21 (wb7 + A to Z only, ~8 h; locally 7/10 clean, median 5.42) scored **12.472 / 11.877** on the portal (#75): A to Z-only training overfits. J34 continues from sz1-end on **A to Z + re:Invent 2018** (`m34d-jason-*`), lr 0.00005. Later A to Z-only snapshots (sz2–sz6) are not upload candidates.
+
+**Full comparison (22:04–22:19, 5 trials each, DR off; `logs/j34_compare.txt`):** A to Z clean laps — sz4-end 1/5, sz5-end 3/5, sz6 (stop) 4/5; re:Invent 2018 off-tracks in 5 laps — sz2 12, sz4 10, sz5 14, sz6 10 (sz1: 5). Later A to Z-only snapshots got worse on re:Invent 2018.
+
+**Portal: sz1-end did badly (Jason, 2026-10-07 ~22:15; score to be added).** Like Model 21, a model that improved on the local A to Z test (8/10 clean) got worse on the secret track: the straighter S-line / A to Z-only training does not transfer. **J34 stopped 22:25** (`cedc-m34e-jason-stop`). wb7-end (5.814) remains the best.
