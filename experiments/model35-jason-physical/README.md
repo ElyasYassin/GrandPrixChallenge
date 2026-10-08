@@ -13,3 +13,5 @@ Baseline wb7-end (5 trials, DR off): reinvent_carpet **16 off / 5 laps**, mean 1
 **Test 1 (00:00, after ~1.5 h at lr 0.0001; `logs/m35_test1.txt`):** ca3-end carpet 12 off / 9.08 s, A to Z 3/5 clean; **ca4-end carpet 11 off / 8.89 s, A to Z 4/5 clean (mean 6.06)**. Continuing at lr 0.00005 (`m35d-jason-*`).
 
 **Test 2 (02:15, lr 0.00005 since 00:09; `logs/m35_test2.txt`):** ca6-end carpet 8 off / 8.42 s (concrete 50 off — an outlier run), **ca8-end carpet 8 off / 8.40 s (first clean carpet laps), A to Z 3/5 clean / 6.14 s, concrete (held out) 15 off / 10.20 s** (wb7: 29 / 14.0). Packaged `submissions/m35d-jason-ca8-end` as the current physical candidate.
+
+**Test 3 (04:30; `logs/m35_test3.txt`):** **ca10-end carpet 7 off / 8.92 s, A to Z 5/5 clean / 6.06 s, concrete 16 off / 10.06 s** → physical pick (packaged). ca12-end carpet 11 / 9.62, **A to Z 5/5 clean / 5.66 s** (best A to Z result we have), concrete 24 / 13.71 → packaged as a possible portal probe (caveat: local A to Z misled us for J34 / Model 21, but J35 trains on two tracks with DR).
